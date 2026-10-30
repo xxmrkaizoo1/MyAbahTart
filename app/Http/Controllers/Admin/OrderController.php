@@ -6,6 +6,7 @@ use App\Enums\CancellationReason;
 use App\Enums\OrderStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Services\Billplz;
 use App\Services\ShopInsights;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -62,7 +63,7 @@ class OrderController extends Controller
         ]);
     }
 
-    public function update(Request $request, Order $order): RedirectResponse
+    public function update(Request $request, Order $order, Billplz $billplz): RedirectResponse
     {
         $validated = $request->validate([
             'status' => ['required', Rule::enum(OrderStatus::class)],
@@ -77,6 +78,14 @@ class OrderController extends Controller
 
         if (! $order->status->isActive()) {
             return back()->with('error', 'This order is already closed.');
+        }
+
+        if ($status !== OrderStatus::Cancelled && $order->isAwaitingPayment()) {
+            return back()->with('error', 'Wait for the customer to pay before starting this order.');
+        }
+
+        if ($status === OrderStatus::Cancelled && $order->isAwaitingPayment()) {
+            $billplz->deleteBill($order->billplz_bill_id);
         }
 
         if ($status !== OrderStatus::Cancelled && $status !== $order->status->next()) {

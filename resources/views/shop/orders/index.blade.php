@@ -3,6 +3,8 @@
         <p class="eyebrow">Account</p>
         <h1 class="mt-1 text-4xl font-extrabold sm:text-5xl">My orders</h1>
 
+        <div data-live="orders">
+
         @if ($activeOrders->isEmpty() && $pastOrders->isEmpty())
             <div class="mt-8 flex flex-col items-center rounded-4xl bg-surface px-6 py-16 text-center shadow-soft ring-1 ring-ink/5">
                 <span class="grid size-20 place-items-center rounded-full bg-berry-50 text-berry-600"><x-icon name="receipt" class="size-9" /></span>
@@ -47,7 +49,7 @@
         @if ($pastOrders->isNotEmpty())
             <section class="mt-12">
                 <h2 class="section-title">Past orders</h2>
-                <ul class="mt-5 grid gap-3 md:grid-cols-2">
+                <ul class="mt-5 grid grid-cols-1 gap-3 md:grid-cols-2">
                     @foreach ($pastOrders as $order)
                         @php($firstItem = $order->items->first())
                         <li class="flex items-center gap-4 rounded-3xl bg-surface p-3 ring-1 ring-ink/5 sm:p-4">
@@ -69,5 +71,6 @@
                 </ul>
             </section>
         @endif
+        </div>
     </div>
 </x-layouts.shop>

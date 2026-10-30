@@ -16,6 +16,9 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->encryptCookies(except: [Theme::COOKIE]);
 
+        // Billplz posts payment updates from its own servers, without a CSRF token; they are checked by X Signature instead.
+        $middleware->validateCsrfTokens(except: ['payments/billplz/callback']);
+
         // Tunnels such as ngrok forward requests from this machine; trust their HTTPS headers.
         $middleware->trustProxies(at: ['127.0.0.1', '::1']);
 

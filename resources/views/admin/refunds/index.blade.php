@@ -1,5 +1,5 @@
 <x-layouts.admin title="Refunds" subtitle="Review customer refund requests and keep track of money paid back.">
-    <div class="grid gap-4 sm:grid-cols-3">
+    <div data-live="refund-stats" class="grid gap-4 sm:grid-cols-3">
         <div class="card p-5">
             <p class="text-sm font-semibold text-ink-soft">Waiting for review</p>
             <p class="mt-1 font-display text-3xl font-extrabold {{ $pendingCount > 0 ? 'text-rose-700' : '' }}">{{ $pendingCount }}</p>
@@ -14,7 +14,7 @@
         </div>
     </div>
 
-    <nav class="scrollbar-none -mx-4 mt-6 flex gap-2 overflow-x-auto px-4 sm:mx-0 sm:px-0" aria-label="Filter refunds">
+    <nav data-live="refund-tabs" class="scrollbar-none -mx-4 mt-6 flex gap-2 overflow-x-auto px-4 sm:mx-0 sm:px-0" aria-label="Filter refunds">
         @foreach ([null => 'All', ...collect(\App\Enums\RefundStatus::cases())->mapWithKeys(fn ($case) => [$case->value => $case->label()])->all()] as $value => $label)
             <a href="{{ route('admin.refunds.index', array_filter(['status' => $value])) }}" @class([
                 'shrink-0 rounded-full px-4 py-2 text-sm font-semibold ring-1 transition',
@@ -24,7 +24,7 @@
         @endforeach
     </nav>
 
-    <section class="card mt-4 overflow-hidden">
+    <section data-live="refund-list" class="card mt-4 overflow-hidden">
         @if ($refunds->isEmpty())
             <div class="flex flex-col items-center px-6 py-16 text-center">
                 <span class="grid size-16 place-items-center rounded-full bg-mint-50 text-mint-700"><x-icon name="check" class="size-7" /></span>

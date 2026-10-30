@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Enums\DeliveryMethod;
 use App\Http\Controllers\Controller;
+use App\Services\Billplz;
 use App\Services\Lalamove;
 use App\Services\Storefront;
 use Illuminate\Http\RedirectResponse;
@@ -14,12 +15,12 @@ use Illuminate\View\View;
 
 class DeliveryController extends Controller
 {
-    public function edit(Storefront $storefront, Lalamove $lalamove): View
+    public function edit(Storefront $storefront, Lalamove $lalamove, Billplz $billplz): View
     {
-        return view('admin.delivery.edit', ['storefront' => $storefront, 'lalamove' => $lalamove]);
+        return view('admin.delivery.edit', ['storefront' => $storefront, 'lalamove' => $lalamove, 'billplz' => $billplz]);
     }
 
-    public function update(Request $request, Storefront $storefront, Lalamove $lalamove): RedirectResponse
+    public function update(Request $request, Storefront $storefront, Lalamove $lalamove, Billplz $billplz): RedirectResponse
     {
         $rules = [
             'delivery_free_over' => ['nullable', 'numeric', 'min:0', 'max:100000'],
@@ -45,6 +46,13 @@ class DeliveryController extends Controller
 
         if (! in_array('1', array_map(fn (DeliveryMethod $method) => $validated["delivery_{$method->value}_enabled"], DeliveryMethod::cases()), true)) {
             throw ValidationException::withMessages(['delivery_options' => 'Keep at least one option switched on so customers can check out.']);
+        }
+
+        $validated['payment_cod_enabled'] = $request->boolean('payment_cod_enabled') ? '1' : '0';
+        $validated['payment_online_enabled'] = $request->boolean('payment_online_enabled') ? '1' : '0';
+
+        if ($validated['payment_cod_enabled'] === '0' && ($validated['payment_online_enabled'] === '0' || ! $billplz->isConfigured())) {
+            throw ValidationException::withMessages(['payment_options' => 'Keep at least one working payment option switched on so customers can check out.']);
         }
 
         $validated['delivery_free_over'] = number_format((float) ($validated['delivery_free_over'] ?? 0), 2, '.', '');

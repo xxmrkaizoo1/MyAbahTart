@@ -1,12 +1,16 @@
 <?php
 
 use App\Http\Controllers\Admin;
+use App\Http\Controllers\Auth\EmailVerificationController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\BillplzController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\DeliveryQuoteController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\LiveController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
@@ -18,6 +22,9 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', HomeController::class)->name('home');
 Route::get('/menu', [ProductController::class, 'index'])->name('products.index');
 Route::get('/menu/{product}', [ProductController::class, 'show'])->name('products.show');
+
+Route::get('/payments/billplz/return', [BillplzController::class, 'return'])->name('payments.billplz.return');
+Route::post('/payments/billplz/callback', [BillplzController::class, 'callback'])->name('payments.billplz.callback');
 
 Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
 Route::post('/cart/{product}', [CartController::class, 'store'])->name('cart.store');
@@ -32,23 +39,37 @@ Route::middleware('guest')->group(function () {
     Route::post('/login', [LoginController::class, 'store'])->middleware('throttle:10,1');
     Route::get('/register', [RegisterController::class, 'create'])->name('register');
     Route::post('/register', [RegisterController::class, 'store']);
+
+    Route::get('/forgot-password', [PasswordResetController::class, 'create'])->name('password.request');
+    Route::post('/forgot-password', [PasswordResetController::class, 'store'])->middleware('throttle:6,1')->name('password.email');
+    Route::get('/reset-password/{token}', [PasswordResetController::class, 'edit'])->name('password.reset');
+    Route::post('/reset-password', [PasswordResetController::class, 'update'])->middleware('throttle:6,1')->name('password.update');
 });
 
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [LoginController::class, 'destroy'])->name('logout');
 
-    Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
+    Route::get('/live', LiveController::class)->middleware('throttle:120,1')->name('live');
 
-    Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
-    Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
-    Route::post('/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
-    Route::post('/orders/{order}/reorder', [OrderController::class, 'reorder'])->name('orders.reorder');
-    Route::post('/orders/{order}/refund', [RefundController::class, 'store'])->name('refunds.store');
+    Route::get('/email/verify', [EmailVerificationController::class, 'notice'])->name('verification.notice');
+    Route::get('/email/verify/{id}/{hash}', [EmailVerificationController::class, 'verify'])->middleware(['signed', 'throttle:6,1'])->name('verification.verify');
+    Route::post('/email/verification-notification', [EmailVerificationController::class, 'send'])->middleware('throttle:3,1')->name('verification.send');
 
-    Route::post('/menu/{product}/reviews', [ReviewController::class, 'store'])->name('reviews.store');
-
+    // Customers can still fix a mistyped email on their profile before verifying.
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+
+    Route::middleware('verified')->group(function () {
+        Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
+
+        Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
+        Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
+        Route::post('/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
+        Route::post('/orders/{order}/reorder', [OrderController::class, 'reorder'])->name('orders.reorder');
+        Route::post('/orders/{order}/refund', [RefundController::class, 'store'])->name('refunds.store');
+
+        Route::post('/menu/{product}/reviews', [ReviewController::class, 'store'])->name('reviews.store');
+    });
 });
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {

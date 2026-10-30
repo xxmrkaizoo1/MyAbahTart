@@ -131,6 +131,46 @@
                         </div>
                     </section>
 
+                    {{-- Payment --}}
+                    @php($paymentMethods = \App\Enums\PaymentMethod::forCheckout())
+                    @php($chosenPayment = \App\Enums\PaymentMethod::tryFrom((string) old('payment_method')) ?? $paymentMethods[0])
+                    <section>
+                        <h2 class="font-display text-xl font-bold">How would you like to pay?</h2>
+                        @php($onlineComingSoon = \App\Enums\PaymentMethod::onlineComingSoon())
+                        <div @class(['mt-4 grid gap-3', 'sm:grid-cols-2' => count($paymentMethods) > 1 || $onlineComingSoon])>
+                            @if ($onlineComingSoon)
+                                <div class="relative flex items-center gap-3 rounded-3xl bg-surface/60 p-4 opacity-60 ring-1 ring-ink/10" aria-disabled="true">
+                                    <span class="grid size-11 shrink-0 place-items-center rounded-2xl bg-paper-deep text-ink"><x-icon name="lock" /></span>
+                                    <span class="min-w-0 flex-1">
+                                        <span class="block font-bold">{{ \App\Enums\PaymentMethod::Online->checkoutLabel() }}</span>
+                                        <span class="block text-xs text-ink-soft">{{ \App\Enums\PaymentMethod::Online->checkoutDescription() }}</span>
+                                    </span>
+                                    <span class="shrink-0 rounded-full bg-paper-deep px-2.5 py-1 text-[11px] font-bold text-ink-soft">Coming soon</span>
+                                </div>
+                            @endif
+                            @foreach ($paymentMethods as $method)
+                                <label class="relative flex cursor-pointer items-center gap-3 rounded-3xl bg-surface p-4 ring-1 ring-ink/10 transition has-[:checked]:bg-berry-50 has-[:checked]:ring-2 has-[:checked]:ring-berry-600">
+                                    <input type="radio" name="payment_method" value="{{ $method->value }}" form="checkout-form" class="peer sr-only" data-payment-option
+                                        data-button="{{ $method === \App\Enums\PaymentMethod::Online ? 'Continue to payment' : 'Place order' }}"
+                                        data-note="{{ $method === \App\Enums\PaymentMethod::Online ? 'Secure payment by Billplz · FPX online banking, cards & e-wallets' : 'Pay in cash on delivery or at pickup' }}"
+                                        @checked($chosenPayment === $method)>
+                                    <span class="grid size-11 shrink-0 place-items-center rounded-2xl bg-paper-deep text-ink peer-checked:bg-berry-600 peer-checked:text-white"><x-icon :name="$method === \App\Enums\PaymentMethod::Online ? 'lock' : 'ticket'" /></span>
+                                    <span class="min-w-0 flex-1">
+                                        <span class="block font-bold">{{ $method->checkoutLabel() }}</span>
+                                        <span class="block text-xs text-ink-soft">{{ $method->checkoutDescription() }}</span>
+                                    </span>
+                                    @if ($method === \App\Enums\PaymentMethod::Online)
+                                        <span class="hidden shrink-0 gap-1 text-[10px] font-extrabold tracking-wide text-ink-soft sm:flex">
+                                            <span class="rounded-md bg-paper-deep px-1.5 py-1">FPX</span>
+                                            <span class="rounded-md bg-paper-deep px-1.5 py-1">CARD</span>
+                                        </span>
+                                    @endif
+                                </label>
+                            @endforeach
+                        </div>
+                        @error('payment_method') <p class="mt-2 text-sm text-rose-700">{{ $message }}</p> @enderror
+                    </section>
+
                     {{-- Contact --}}
                     <section>
                         <h2 class="font-display text-xl font-bold">Your details</h2>
@@ -197,11 +237,11 @@
                         </dl>
 
                         @auth
-                            <button type="submit" class="btn-butter mt-6 w-full py-4 text-base">Place order <x-icon name="arrow-right" class="size-4.5" /></button>
+                            <button type="submit" class="btn-butter mt-6 w-full py-4 text-base"><span data-payment-button>{{ $chosenPayment === \App\Enums\PaymentMethod::Online ? 'Continue to payment' : 'Place order' }}</span> <x-icon name="arrow-right" class="size-4.5" /></button>
                         @else
                             <a href="{{ route('login', ['return' => 'cart']) }}" class="btn-butter mt-6 w-full py-4 text-base">Sign in to check out</a>
                         @endauth
-                        <p class="mt-3 flex items-center justify-center gap-1.5 text-xs text-white/50"><x-icon name="lock" class="size-3.5" /> Pay on delivery or at pickup</p>
+                        <p class="mt-3 flex items-center justify-center gap-1.5 text-xs text-white/50"><x-icon name="lock" class="size-3.5" /> <span data-payment-note>{{ $chosenPayment === \App\Enums\PaymentMethod::Online ? 'Secure payment by Billplz · FPX online banking, cards & e-wallets' : 'Pay in cash on delivery or at pickup' }}</span></p>
                     </form>
                 </aside>
             </div>

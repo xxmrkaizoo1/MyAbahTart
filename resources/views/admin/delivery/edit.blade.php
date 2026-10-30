@@ -87,6 +87,34 @@
             @endforeach
         </div>
 
+        <section class="card p-5 sm:p-6">
+            <h2 class="font-display text-xl font-bold">Payment at checkout</h2>
+            <p class="text-sm text-ink-soft">How customers can pay for online orders. Counter sales are not affected.</p>
+            @error('payment_options') <p class="mt-3 rounded-2xl bg-rose-50 p-3 text-sm font-semibold text-rose-700 ring-1 ring-rose-200">{{ $message }}</p> @enderror
+
+            <div class="mt-4 grid gap-3 md:grid-cols-2">
+                @foreach ([
+                    ['payment_cod_enabled', \App\Enums\PaymentMethod::Cash, 'ticket', null],
+                    ['payment_online_enabled', \App\Enums\PaymentMethod::Online, 'lock', $billplz->isConfigured()],
+                ] as [$key, $method, $icon, $connected])
+                    <label class="flex cursor-pointer items-start gap-3 rounded-3xl bg-paper p-4 ring-1 ring-ink/5">
+                        <span class="grid size-11 shrink-0 place-items-center rounded-2xl bg-paper-deep text-ink"><x-icon :name="$icon" /></span>
+                        <span class="min-w-0 flex-1">
+                            <span class="block font-bold">{{ $method->checkoutLabel() }}</span>
+                            <span class="block text-xs text-ink-soft">{{ $method->checkoutDescription() }}</span>
+                            @if ($connected === true)
+                                <span class="mt-2 flex items-center gap-1.5 text-xs font-semibold text-mint-700"><x-icon name="check" class="size-3.5" /> Connected to Billplz {{ $billplz->isSandbox() ? '(sandbox: test payments)' : '(live)' }}</span>
+                            @elseif ($connected === false)
+                                <span class="mt-2 block rounded-xl bg-surface p-2.5 text-xs text-ink-soft">Not connected yet. Add <code class="font-bold">BILLPLZ_API_KEY</code>, <code class="font-bold">BILLPLZ_COLLECTION_ID</code> and <code class="font-bold">BILLPLZ_X_SIGNATURE</code> to the <code class="font-bold">.env</code> file.</span>
+                            @endif
+                        </span>
+                        <input type="checkbox" name="{{ $key }}" value="1" @checked(old($key, $errors->any() ? null : $storefront->get($key)) === '1') class="peer sr-only">
+                        <span class="relative h-7 w-12 shrink-0 rounded-full bg-ink/15 transition peer-checked:bg-mint-500 after:absolute after:top-1 after:left-1 after:size-5 after:rounded-full after:bg-white after:shadow after:transition peer-checked:after:translate-x-5"></span>
+                    </label>
+                @endforeach
+            </div>
+        </section>
+
         <p class="text-sm text-ink-soft">Switched-off options are hidden at checkout. Past orders keep working, and counter sales are not affected.</p>
 
         <div class="flex justify-end">

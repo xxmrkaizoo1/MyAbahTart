@@ -44,7 +44,20 @@ class ProfileController extends Controller
             $user->password = $validated['password'];
         }
 
+        $emailChanged = $user->isDirty('email');
+
+        if ($emailChanged) {
+            $user->email_verified_at = null;
+        }
+
         $user->save();
+
+        if ($emailChanged) {
+            $user->sendEmailVerificationNotification();
+
+            return redirect()->route('verification.notice')
+                ->with('status', "Profile saved. We’ve sent a link to {$user->email} to verify your new email.");
+        }
 
         return back()->with('status', 'Your profile has been updated.');
     }

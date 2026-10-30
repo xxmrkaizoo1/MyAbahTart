@@ -334,8 +334,13 @@ document.querySelectorAll('input[name="size"][data-price]').forEach((radio) => {
 });
 
 // Pop-up dialogs: [data-dialog-open="id"] opens <dialog id>, [data-dialog-close] or a click on the backdrop closes it.
-document.querySelectorAll('[data-dialog-open]').forEach((button) => {
-    button.addEventListener('click', () => document.getElementById(button.dataset.dialogOpen)?.showModal());
+// Listened for on the document so buttons inside live-refreshed sections keep working.
+document.addEventListener('click', (event) => {
+    const button = event.target.closest('[data-dialog-open]');
+
+    if (button) {
+        document.getElementById(button.dataset.dialogOpen)?.showModal();
+    }
 });
 
 document.querySelectorAll('dialog[data-dialog]').forEach((dialog) => {
@@ -668,6 +673,134 @@ document.querySelectorAll('[data-size-stock-total]').forEach((total) => {
         count.addEventListener('input', sync);
     });
     sync();
+});
+
+// Live updates: every few seconds ask the server for a fingerprint of the user's orders. When it changes,
+// fetch this page again and swap in the fresh [data-live] sections, leaving anything the user is working on alone.
+const liveUrl = document.body.dataset.liveUrl;
+
+if (liveUrl) {
+    const POLL_EVERY_MS = 5000;
+    let version = null;
+    let incoming = null;
+    let busy = false;
+
+    const markEdited = (event) => event.target.closest?.('[data-live]')?.setAttribute('data-live-edited', '');
+    document.addEventListener('input', markEdited);
+    document.addEventListener('change', markEdited);
+
+    const isBusyWithSomething = () =>
+        document.querySelector('dialog[open], [data-drawer]:not(.hidden)') !== null ||
+        document.activeElement?.matches('input, textarea, select');
+
+    // Returns false when the swap has to wait, so the next poll tries again.
+    const refreshSections = async () => {
+        const regions = [...document.querySelectorAll('[data-live]')];
+
+        if (regions.length === 0) {
+            return true;
+        }
+
+        if (isBusyWithSomething()) {
+            return false;
+        }
+
+        const response = await fetch(window.location.href, { headers: { 'X-Live-Refresh': '1' }, credentials: 'same-origin' });
+
+        if (!response.ok || response.redirected) {
+            return true;
+        }
+
+        const fresh = new DOMParser().parseFromString(await response.text(), 'text/html');
+        const seen = {};
+
+        regions.forEach((region) => {
+            const name = region.dataset.live;
+            seen[name] = (seen[name] ?? -1) + 1;
+            const replacement = fresh.querySelectorAll(`[data-live="${CSS.escape(name)}"]`)[seen[name]];
+
+            if (replacement && !region.hasAttribute('data-live-edited') && replacement.innerHTML !== region.innerHTML) {
+                region.innerHTML = replacement.innerHTML;
+            }
+        });
+
+        return true;
+    };
+
+    const announceNewOrders = (count) => {
+        const toast = document.createElement('div');
+        toast.className = 'pointer-events-none fixed inset-x-0 bottom-24 z-[60] flex justify-center px-4 transition duration-300 sm:top-6 sm:bottom-auto print:hidden';
+        toast.innerHTML = `<a href="${document.body.dataset.liveOrdersUrl}" class="pointer-events-auto flex w-full max-w-md items-center gap-3 rounded-2xl bg-plum-900 px-4 py-3.5 text-sm font-semibold text-white shadow-pop" role="status">
+            <span class="grid size-6 shrink-0 place-items-center rounded-full bg-butter-300 text-xs font-extrabold text-plum-900">${count}</span>
+            <span class="flex-1">${count === 1 ? 'New order received' : `${count} new orders received`}</span>
+            <span class="text-xs text-white/60">View →</span>
+        </a>`;
+        document.body.append(toast);
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            setTimeout(() => toast.remove(), 300);
+        }, 8000);
+
+        try {
+            const audio = new AudioContext();
+            [880, 1175].forEach((frequency, index) => {
+                const tone = audio.createOscillator();
+                const volume = audio.createGain();
+                tone.frequency.value = frequency;
+                volume.gain.setValueAtTime(0.15, audio.currentTime + index * 0.18);
+                volume.gain.exponentialRampToValueAtTime(0.001, audio.currentTime + index * 0.18 + 0.25);
+                tone.connect(volume).connect(audio.destination);
+                tone.start(audio.currentTime + index * 0.18);
+                tone.stop(audio.currentTime + index * 0.18 + 0.25);
+            });
+        } catch {
+            // Browsers may block sound until the page has been clicked; the toast still shows.
+        }
+    };
+
+    const poll = async () => {
+        if (busy || document.hidden) {
+            return;
+        }
+
+        busy = true;
+
+        try {
+            const response = await fetch(liveUrl, { headers: { Accept: 'application/json' }, credentials: 'same-origin' });
+
+            if (response.ok) {
+                const data = await response.json();
+
+                if (data.incoming !== null) {
+                    if (incoming !== null && data.incoming > incoming) {
+                        announceNewOrders(data.incoming - incoming);
+                    }
+
+                    incoming = data.incoming;
+                }
+
+                if (version === null || (data.version !== version && (await refreshSections()))) {
+                    version = data.version;
+                }
+            }
+        } catch {
+            // Offline or the server is busy: try again on the next tick.
+        } finally {
+            busy = false;
+        }
+    };
+
+    poll();
+    setInterval(poll, POLL_EVERY_MS);
+    document.addEventListener('visibilitychange', () => !document.hidden && poll());
+}
+
+// Checkout button and note follow the chosen payment method.
+document.querySelectorAll('[data-payment-option]').forEach((option) => {
+    option.addEventListener('change', () => {
+        document.querySelectorAll('[data-payment-button]').forEach((label) => (label.textContent = option.dataset.button));
+        document.querySelectorAll('[data-payment-note]').forEach((note) => (note.textContent = option.dataset.note));
+    });
 });
 
 // Live preview of the shop's top bar on the Storefront page.

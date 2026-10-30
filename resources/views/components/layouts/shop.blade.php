@@ -23,7 +23,7 @@
         @fonts
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="flex min-h-dvh flex-col">
+    <body class="flex min-h-dvh flex-col" @auth data-live-url="{{ route('live') }}" @endauth>
         <x-flash />
 
         @php($freeOver = $storefront->get('topbar_free_delivery') === '1' ? \App\Enums\DeliveryMethod::freeDeliveryThreshold() : null)
@@ -32,6 +32,16 @@
                 <p class="container-page flex items-center justify-center gap-2 py-2 text-center text-[11px] font-semibold tracking-wide sm:text-xs">
                     <x-icon name="truck" class="size-4 shrink-0 text-butter-300" />
                     <span>@if ($freeOver)Free delivery over @rm($freeOver)@endif @if ($storefront->get('announcement') !== '')<span @class(['hidden sm:inline' => $freeOver])>{{ $freeOver ? '· ' : '' }}{{ $storefront->get('announcement') }}</span>@endif</span>
+                </p>
+            </div>
+        @endif
+
+        @if (auth()->user()?->hasVerifiedEmail() === false && ! request()->routeIs('verification.notice'))
+            <div class="bg-butter-100 text-ink">
+                <p class="container-page flex flex-wrap items-center justify-center gap-x-2 gap-y-1 py-2 text-center text-xs font-semibold sm:text-sm">
+                    <x-icon name="mail" class="size-4 shrink-0 text-butter-600" />
+                    Please verify your email to place orders.
+                    <a href="{{ route('verification.notice') }}" class="font-bold text-berry-700 underline">Resend the link</a>
                 </p>
             </div>
         @endif

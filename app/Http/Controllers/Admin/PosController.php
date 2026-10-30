@@ -57,7 +57,7 @@ class PosController extends Controller
             'items.*.size' => ['nullable', Rule::enum(ProductSize::class)],
             'items.*.quantity' => ['required', 'integer', 'min:1', 'max:999'],
             'discount' => ['nullable', 'numeric', 'min:0', 'max:99999'],
-            'payment_method' => ['required', Rule::enum(PaymentMethod::class)],
+            'payment_method' => ['required', Rule::enum(PaymentMethod::class)->only(PaymentMethod::forCounter())],
             'amount_tendered' => ['nullable', 'required_if:payment_method,'.PaymentMethod::Cash->value, 'numeric', 'min:0', 'max:99999'],
             'customer_name' => ['nullable', 'string', 'max:100'],
         ], [

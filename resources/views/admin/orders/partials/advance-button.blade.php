@@ -1,4 +1,6 @@
-@if ($next = $order->status->next())
+@if ($order->isAwaitingPayment())
+    <span class="inline-flex items-center gap-1.5 rounded-full bg-butter-100 px-3.5 py-2 text-xs font-bold whitespace-nowrap text-butter-600"><x-icon name="clock" class="size-3.5" /> Awaiting payment</span>
+@elseif ($next = $order->status->next())
     <form method="POST" action="{{ route('admin.orders.update', $order) }}">
         @csrf
         @method('PATCH')

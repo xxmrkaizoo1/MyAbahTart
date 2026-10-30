@@ -43,7 +43,7 @@
     </x-slot:actions>
 
     {{-- KPIs --}}
-    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <div data-live="kpis" class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <div class="card overflow-hidden p-5">
             <div class="flex items-center justify-between">
                 <p class="text-sm font-semibold text-ink-soft">Revenue · {{ $days }}d</p>
@@ -285,7 +285,7 @@
     </div>
 
     {{-- Recent orders --}}
-    <section class="card mt-4 overflow-hidden">
+    <section data-live="recent-orders" class="card mt-4 overflow-hidden">
         <div class="flex items-center justify-between p-5 sm:p-6">
             <h2 class="font-display text-xl font-bold">Latest orders</h2>
             <a href="{{ route('admin.orders.index') }}" class="text-sm font-bold text-berry-700 hover:underline">View all</a>

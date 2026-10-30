@@ -50,6 +50,8 @@ class Storefront
         'delivery_pickup_enabled' => '1',
         'delivery_free_over' => '150.00',
         'delivery_express_live' => '0',
+        'payment_cod_enabled' => '1',
+        'payment_online_enabled' => '0',
         'lalamove_service_type' => 'MOTORCYCLE',
         'lalamove_pickup_address' => '',
     ];

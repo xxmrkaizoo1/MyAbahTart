@@ -122,7 +122,7 @@ class ChannelSales
             ->get()
             ->keyBy('payment_method');
 
-        return collect(PaymentMethod::cases())
+        return collect(PaymentMethod::forCounter())
             ->map(fn (PaymentMethod $method) => [
                 'method' => $method,
                 'orders' => (int) ($rows[$method->value]->order_count ?? 0),

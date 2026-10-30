@@ -1,12 +1,14 @@
 <x-layouts.admin title="Orders" subtitle="Move orders across the board as the kitchen works through them.">
+    <div data-live="kitchen-focus">
     @if ($kitchenFocus)
         <x-insight title="Batch suggestion" class="mb-6">
             <span class="font-bold text-ink">{{ $kitchenFocus['units'] }}× {{ $kitchenFocus['product_name'] }}</span> are needed across {{ $kitchenFocus['orders'] }} waiting {{ Str::plural('order', $kitchenFocus['orders']) }}. Prepare them together to save time.
         </x-insight>
     @endif
+    </div>
 
     {{-- Kanban board --}}
-    <div class="scrollbar-none -mx-4 flex snap-x snap-mandatory scroll-px-4 items-start gap-4 overflow-x-auto px-4 pb-2 sm:mx-0 sm:px-0 lg:grid lg:grid-cols-3 lg:overflow-visible">
+    <div data-live="board" class="scrollbar-none -mx-4 flex snap-x snap-mandatory scroll-px-4 items-start gap-4 overflow-x-auto px-4 pb-2 sm:mx-0 sm:px-0 lg:grid lg:grid-cols-3 lg:overflow-visible">
         @foreach ([
             ['received', 'New', 'bell', 'bg-sky-500'],
             ['preparing', 'Being prepared', 'whisk', 'bg-butter-400'],
@@ -59,7 +61,7 @@
             </form>
         </div>
 
-        <nav class="scrollbar-none flex gap-1.5 overflow-x-auto border-y border-ink/5 bg-paper/60 px-5 py-3 sm:px-6">
+        <nav data-live="status-tabs" class="scrollbar-none flex gap-1.5 overflow-x-auto border-y border-ink/5 bg-paper/60 px-5 py-3 sm:px-6">
             <a href="{{ route('admin.orders.index', array_filter(['search' => $search])) }}" @class([
                 'shrink-0 rounded-full px-3.5 py-1.5 text-sm font-bold',
                 'bg-plum-900 text-white' => ! $activeStatus,
@@ -82,7 +84,7 @@
         @if ($orders->isEmpty())
             <p class="p-12 text-center text-sm text-ink-soft">No orders match.</p>
         @else
-            <div class="hidden overflow-x-auto md:block">
+            <div data-live="table" class="relative hidden overflow-x-auto md:block">
                 <table class="w-full text-sm">
                     <thead class="text-left text-xs font-bold text-ink-soft">
                         <tr>
@@ -105,7 +107,7 @@
                                 <td class="px-4 py-3.5 font-semibold">{{ $order->customerName() }}</td>
                                 <td class="max-w-56 px-4 py-3.5"><p class="truncate text-ink-soft">{{ $order->items->map(fn ($item) => $item->quantity.'× '.$item->displayName())->implode(', ') }}</p></td>
                                 <td class="px-4 py-3.5 text-ink-soft">{{ $order->delivery_method->label() }}</td>
-                                <td class="px-4 py-3.5"><x-status-badge :order="$order" /></td>
+                                <td class="px-4 py-3.5"><div class="flex flex-wrap gap-1"><x-status-badge :order="$order" /><x-payment-badge :order="$order" /></div></td>
                                 <td class="px-4 py-3.5 text-right font-bold">@rm($order->total)</td>
                                 <td class="px-6 py-3.5 text-right">@include('admin.orders.partials.advance-button', ['order' => $order])</td>
                             </tr>
@@ -114,7 +116,7 @@
                 </table>
             </div>
 
-            <ul class="divide-y divide-ink/5 md:hidden">
+            <ul data-live="table-mobile" class="divide-y divide-ink/5 md:hidden">
                 @foreach ($orders as $order)
                     <li class="p-4">
                         <div class="flex items-start justify-between gap-3">
@@ -126,7 +128,7 @@
                             <p class="font-bold">@rm($order->total)</p>
                         </div>
                         <div class="mt-3 flex items-center justify-between gap-2">
-                            <x-status-badge :order="$order" />
+                            <div class="flex flex-wrap gap-1"><x-status-badge :order="$order" /><x-payment-badge :order="$order" /></div>
                             @include('admin.orders.partials.advance-button', ['order' => $order])
                         </div>
                     </li>

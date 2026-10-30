@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Enums\CancellationReason;
 use App\Enums\OrderStatus;
 use App\Models\Order;
+use App\Services\Billplz;
 use App\Services\Cart;
 use App\Services\ShopInsights;
 use Illuminate\Http\RedirectResponse;
@@ -39,7 +40,7 @@ class OrderController extends Controller
         ]);
     }
 
-    public function cancel(Request $request, Order $order): RedirectResponse
+    public function cancel(Request $request, Order $order, Billplz $billplz): RedirectResponse
     {
         abort_unless($order->user_id === $request->user()->id, 404);
 
@@ -55,6 +56,10 @@ class OrderController extends Controller
             'cancellation_reason.enum' => 'Tell us why you’re cancelling.',
             'cancellation_note.required_if' => 'Tell us a little more about why you’re cancelling.',
         ]);
+
+        if ($order->isAwaitingPayment()) {
+            $billplz->deleteBill($order->billplz_bill_id);
+        }
 
         DB::transaction(function () use ($order, $validated) {
             foreach ($order->items as $item) {

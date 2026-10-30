@@ -33,6 +33,7 @@ class DeliveryOptionsTest extends TestCase
             'delivery_pickup_fee' => '0',
             'delivery_pickup_enabled' => '1',
             'delivery_free_over' => '200',
+            'payment_cod_enabled' => '1',
         ], $overrides);
     }
 

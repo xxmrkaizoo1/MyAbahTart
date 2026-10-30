@@ -2,6 +2,7 @@
     <div class="container-page py-6 sm:py-10">
         <a href="{{ route('orders.index') }}" class="btn-ghost -ml-4"><x-icon name="arrow-left" class="size-4" /> All orders</a>
 
+        <div data-live="order-head">
         <div class="mt-2 flex flex-wrap items-end justify-between gap-4">
             <div>
                 <p class="eyebrow">Order {{ $order->code }}</p>
@@ -14,11 +15,26 @@
                 @elseif ($order->refundedAmount() > 0)
                     <a href="#refunds" class="inline-flex items-center rounded-full px-3 py-1.5 text-sm font-bold ring-1 {{ \App\Enums\RefundStatus::Approved->badgeClasses() }}">{{ $order->isFullyRefunded() ? 'Refunded' : 'Partly refunded' }}</a>
                 @endif
+                <x-payment-badge :order="$order" class="text-sm" />
                 <x-status-badge :order="$order" class="text-sm" />
             </div>
         </div>
 
-        <section class="mt-8 rounded-4xl bg-surface p-5 shadow-soft ring-1 ring-ink/5 sm:p-8">
+        @if ($order->isAwaitingPayment())
+            <section class="mt-6 flex flex-col gap-4 rounded-4xl bg-butter-100 p-5 ring-1 ring-butter-500/30 sm:flex-row sm:items-center sm:p-6">
+                <span class="grid size-12 shrink-0 place-items-center rounded-2xl bg-butter-300 text-plum-900"><x-icon name="lock" /></span>
+                <div class="min-w-0 flex-1">
+                    <p class="font-display text-lg font-bold">Complete your payment</p>
+                    <p class="text-sm text-ink-soft">We start preparing once you’ve paid. Unpaid orders are cancelled {{ $order->created_at->addMinutes(\App\Services\Billplz::PAYMENT_WINDOW_MINUTES)->diffForHumans() }}.</p>
+                </div>
+                <a href="{{ $order->payment_url }}" class="btn-primary shrink-0 px-6 py-3">Pay @rm($order->total) <x-icon name="arrow-right" class="size-4" /></a>
+            </section>
+        @elseif ($order->paid_at)
+            <p class="mt-4 inline-flex items-center gap-2 text-sm text-ink-soft"><x-icon name="lock" class="size-4 text-mint-600" /> Paid online on {{ $order->paid_at->format('j M Y, g:i a') }}</p>
+        @endif
+        </div>
+
+        <section data-live="order-progress" class="mt-8 rounded-4xl bg-surface p-5 shadow-soft ring-1 ring-ink/5 sm:p-8">
             @include('shop.orders.partials.progress', ['order' => $order, 'estimate' => $estimate])
             @include('shop.orders.partials.cancellation', ['order' => $order])
         </section>
@@ -86,7 +102,7 @@
                 @if ($order->refunds->isNotEmpty())
                     <section id="refunds" class="rounded-3xl bg-surface p-5 ring-1 ring-ink/5">
                         <p class="eyebrow">Refunds</p>
-                        <div class="mt-3">@include('shop.orders.partials.refunds', ['order' => $order])</div>
+                        <div data-live="order-refunds" class="mt-3">@include('shop.orders.partials.refunds', ['order' => $order])</div>
                     </section>
                 @endif
 

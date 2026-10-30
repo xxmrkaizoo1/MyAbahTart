@@ -29,7 +29,7 @@
         @fonts
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="min-h-dvh bg-canvas print:bg-white">
+    <body class="min-h-dvh bg-canvas print:bg-white" data-live-url="{{ route('live') }}" data-live-orders-url="{{ route('admin.orders.index') }}">
         <x-flash />
 
         <header data-site-header class="bg-plum-900 text-white print:hidden">
@@ -57,11 +57,11 @@
                                 <span data-nav-pill class="absolute inset-y-0 left-0 -z-10 w-full rounded-button bg-white shadow-md" aria-hidden="true"></span>
                             @endif
                             <x-icon :name="$icon" class="size-4.5 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:-rotate-12" /> <span class="lg:max-2xl:sr-only">{{ $label }}</span>
-                            @if ($route === 'admin.orders.index' && $activeOrderCount > 0)
-                                <span class="rounded-full bg-berry-500 px-1.5 py-0.5 text-[10px] font-extrabold text-white">{{ $activeOrderCount }}</span>
+                            @if ($route === 'admin.orders.index')
+                                <span data-live="nav-orders" class="contents">@if ($activeOrderCount > 0)<span class="rounded-full bg-berry-500 px-1.5 py-0.5 text-[10px] font-extrabold text-white">{{ $activeOrderCount }}</span>@endif</span>
                             @endif
-                            @if ($route === 'admin.refunds.index' && $pendingRefundCount > 0)
-                                <span class="rounded-full bg-rose-500 px-1.5 py-0.5 text-[10px] font-extrabold text-white">{{ $pendingRefundCount }}</span>
+                            @if ($route === 'admin.refunds.index')
+                                <span data-live="nav-refunds" class="contents">@if ($pendingRefundCount > 0)<span class="rounded-full bg-rose-500 px-1.5 py-0.5 text-[10px] font-extrabold text-white">{{ $pendingRefundCount }}</span>@endif</span>
                             @endif
                         </a>
                     @endforeach
@@ -109,11 +109,11 @@
                             'text-white/75 hover:bg-white/10' => ! request()->routeIs($pattern),
                         ])>
                             <x-icon :name="$icon" /> {{ $label }}
-                            @if ($route === 'admin.orders.index' && $activeOrderCount > 0)
-                                <span class="ml-auto rounded-full bg-berry-500 px-2 py-0.5 text-xs font-extrabold text-white">{{ $activeOrderCount }}</span>
+                            @if ($route === 'admin.orders.index')
+                                <span data-live="drawer-orders" class="contents">@if ($activeOrderCount > 0)<span class="ml-auto rounded-full bg-berry-500 px-2 py-0.5 text-xs font-extrabold text-white">{{ $activeOrderCount }}</span>@endif</span>
                             @endif
-                            @if ($route === 'admin.refunds.index' && $pendingRefundCount > 0)
-                                <span class="ml-auto rounded-full bg-rose-500 px-2 py-0.5 text-xs font-extrabold text-white">{{ $pendingRefundCount }}</span>
+                            @if ($route === 'admin.refunds.index')
+                                <span data-live="drawer-refunds" class="contents">@if ($pendingRefundCount > 0)<span class="ml-auto rounded-full bg-rose-500 px-2 py-0.5 text-xs font-extrabold text-white">{{ $pendingRefundCount }}</span>@endif</span>
                             @endif
                         </a>
                     @endforeach

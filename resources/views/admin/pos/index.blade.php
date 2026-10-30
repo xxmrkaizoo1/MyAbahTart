@@ -148,7 +148,7 @@
                 <fieldset>
                     <legend class="label">Payment</legend>
                     <div class="grid grid-cols-3 gap-2">
-                        @foreach (\App\Enums\PaymentMethod::cases() as $method)
+                        @foreach (\App\Enums\PaymentMethod::forCounter() as $method)
                             <label class="cursor-pointer">
                                 <input type="radio" name="payment_method" value="{{ $method->value }}" data-pos-method class="peer sr-only" @checked(old('payment_method', 'cash') === $method->value)>
                                 <span class="flex flex-col items-center gap-1 rounded-2xl bg-surface px-2 py-2.5 text-center text-xs font-bold ring-1 ring-ink/10 transition peer-checked:bg-plum-900 peer-checked:text-white peer-checked:ring-plum-900 peer-focus-visible:ring-2 peer-focus-visible:ring-berry-500">

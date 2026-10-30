@@ -40,7 +40,8 @@ return [
 
         'public' => [
             'driver' => 'local',
-            'root' => storage_path('app/public'),
+            // Hosts without symlinks (such as InfinityFree) keep uploads straight inside public/storage.
+            'root' => env('PUBLIC_UPLOADS_IN_PUBLIC', false) ? public_path('storage') : storage_path('app/public'),
             'url' => '/storage',
             'visibility' => 'public',
             'throw' => false,

@@ -3,10 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Enums\DeliveryMethod;
+use App\Enums\PaymentMethod;
+use App\Enums\PaymentStatus;
 use App\Exceptions\DeliveryQuoteException;
+use App\Exceptions\PaymentGatewayException;
 use App\Http\Requests\CheckoutRequest;
 use App\Models\Order;
 use App\Models\Product;
+use App\Services\Billplz;
 use App\Services\Cart;
 use App\Services\Lalamove;
 use Illuminate\Http\RedirectResponse;
@@ -15,7 +19,7 @@ use Illuminate\Validation\ValidationException;
 
 class CheckoutController extends Controller
 {
-    public function store(CheckoutRequest $request, Cart $cart, Lalamove $lalamove): RedirectResponse
+    public function store(CheckoutRequest $request, Cart $cart, Lalamove $lalamove, Billplz $billplz): RedirectResponse
     {
         if ($cart->lines()->isEmpty()) {
             return redirect()->route('cart.index')->with('error', 'Your cart is empty.');
@@ -33,8 +37,19 @@ class CheckoutController extends Controller
         }
 
         $summary = $cart->summary($deliveryMethod, $quotedFee);
+        $code = Order::generateCode();
+        $paymentMethod = $summary['total'] > 0 ? $request->paymentMethod() : null;
+        $bill = null;
 
-        $order = DB::transaction(function () use ($request, $cart, $deliveryMethod, $summary) {
+        if ($paymentMethod === PaymentMethod::Online) {
+            try {
+                $bill = $billplz->createBill($code, $summary['total'], $request->user(), $request->validated('phone'));
+            } catch (PaymentGatewayException $exception) {
+                return back()->withInput()->with('error', $exception->getMessage());
+            }
+        }
+
+        $order = DB::transaction(function () use ($request, $cart, $deliveryMethod, $summary, $code, $paymentMethod, $bill) {
             $products = Product::query()
                 ->whereKey($cart->lines()->pluck('product.id'))
                 ->lockForUpdate()
@@ -55,6 +70,7 @@ class CheckoutController extends Controller
             }
 
             $order = Order::create([
+                'code' => $code,
                 'user_id' => $request->user()->id,
                 'delivery_method' => $deliveryMethod,
                 'phone' => $request->validated('phone'),
@@ -65,6 +81,10 @@ class CheckoutController extends Controller
                 'discount' => $summary['discount'],
                 'total' => $summary['total'],
                 'voucher_code' => $summary['discount'] > 0 ? $summary['voucher']?->code : null,
+                'payment_method' => $paymentMethod,
+                'payment_status' => $paymentMethod ? PaymentStatus::Unpaid : null,
+                'billplz_bill_id' => $bill['id'] ?? null,
+                'payment_url' => $bill['url'] ?? null,
             ]);
 
             foreach ($cart->lines() as $line) {
@@ -87,6 +107,10 @@ class CheckoutController extends Controller
 
         if ($request->user()->address === null && $order->address !== null) {
             $request->user()->update(['address' => $order->address]);
+        }
+
+        if ($order->isAwaitingPayment()) {
+            return redirect()->away($order->payment_url);
         }
 
         return redirect()->route('orders.show', $order)

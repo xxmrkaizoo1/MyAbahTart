@@ -6,6 +6,7 @@ use App\Enums\CancellationReason;
 use App\Enums\DeliveryMethod;
 use App\Enums\OrderStatus;
 use App\Enums\PaymentMethod;
+use App\Enums\PaymentStatus;
 use App\Enums\RefundStatus;
 use App\Enums\SalesChannel;
 use Database\Factories\OrderFactory;
@@ -23,7 +24,7 @@ use Illuminate\Support\Str;
     'code', 'user_id', 'customer_name', 'status', 'channel', 'delivery_method', 'phone', 'address',
     'notes', 'subtotal', 'delivery_fee', 'discount', 'total', 'payment_method', 'amount_tendered',
     'served_by', 'voucher_code', 'preparing_at', 'ready_at', 'completed_at', 'cancelled_at',
-    'cancellation_reason', 'cancellation_note',
+    'cancellation_reason', 'cancellation_note', 'payment_status', 'billplz_bill_id', 'payment_url', 'paid_at',
 ])]
 class Order extends Model
 {
@@ -42,6 +43,8 @@ class Order extends Model
             'channel' => SalesChannel::class,
             'payment_method' => PaymentMethod::class,
             'amount_tendered' => 'decimal:2',
+            'payment_status' => PaymentStatus::class,
+            'paid_at' => 'datetime',
             'delivery_method' => DeliveryMethod::class,
             'subtotal' => 'decimal:2',
             'delivery_fee' => 'decimal:2',
@@ -154,6 +157,40 @@ class Order extends Model
         return $this->amount_tendered === null ? null : round((float) $this->amount_tendered - (float) $this->total, 2);
     }
 
+    /**
+     * Whether the customer still has to pay online before the shop starts on the order.
+     */
+    public function isAwaitingPayment(): bool
+    {
+        return $this->payment_method === PaymentMethod::Online
+            && $this->payment_status === PaymentStatus::Unpaid
+            && $this->status !== OrderStatus::Cancelled;
+    }
+
+    /**
+     * Whether the customer pays in cash when the order is delivered or collected.
+     */
+    public function isCashOnDelivery(): bool
+    {
+        return ! $this->isCounterSale() && $this->payment_method === PaymentMethod::Cash;
+    }
+
+    /**
+     * How the order is being paid, in words for badges.
+     */
+    public function paymentLabel(): ?string
+    {
+        if ($this->payment_status === PaymentStatus::Paid) {
+            return $this->isCashOnDelivery() ? 'Paid in cash' : 'Paid online';
+        }
+
+        if ($this->isCashOnDelivery()) {
+            return $this->delivery_method?->requiresAddress() === false ? 'Pay at pickup' : 'Cash on delivery';
+        }
+
+        return $this->payment_status?->label();
+    }
+
     public function getRouteKeyName(): string
     {
         return 'code';
@@ -194,6 +231,11 @@ class Order extends Model
 
         if ($column !== null) {
             $this->{$column} = now();
+        }
+
+        if ($status === OrderStatus::Completed && $this->isCashOnDelivery() && $this->payment_status === PaymentStatus::Unpaid) {
+            $this->payment_status = PaymentStatus::Paid;
+            $this->paid_at = now();
         }
 
         $this->save();

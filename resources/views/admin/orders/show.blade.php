@@ -3,9 +3,15 @@
         <a href="{{ route('admin.orders.index') }}" class="btn-outline"><x-icon name="arrow-left" class="size-4" /> Back to orders</a>
     </x-slot:actions>
 
-    <section class="card p-5 sm:p-8">
+    <section data-live="order-status" class="card p-5 sm:p-8">
         <div class="mb-8 flex flex-wrap items-center justify-between gap-3">
-            <x-status-badge :order="$order" class="text-sm" />
+            <div class="flex flex-wrap items-center gap-2">
+                <x-status-badge :order="$order" class="text-sm" />
+                <x-payment-badge :order="$order" class="text-sm" />
+                @if ($order->paid_at && $order->billplz_bill_id)
+                    <span class="text-xs text-ink-soft">via Billplz · {{ $order->paid_at->format('j M, g:i a') }} · bill {{ $order->billplz_bill_id }}</span>
+                @endif
+            </div>
             @if ($order->status->isActive())
                 <div class="flex items-center gap-2">
                     <button type="button" data-dialog-open="cancel-order" class="btn-ghost text-rose-700">Cancel order</button>

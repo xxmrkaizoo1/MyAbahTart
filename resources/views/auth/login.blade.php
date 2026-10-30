@@ -15,7 +15,10 @@
         </div>
 
         <div>
-            <label for="password" class="label">Password</label>
+            <div class="flex items-baseline justify-between gap-3">
+                <label for="password" class="label">Password</label>
+                <a href="{{ route('password.request') }}" class="text-sm font-semibold text-berry-700 hover:underline">Forgot password?</a>
+            </div>
             <div class="relative">
                 <input id="password" name="password" type="password" required autocomplete="current-password" placeholder="••••••••" class="input pr-12">
                 <button type="button" data-toggle-password="password" class="absolute top-1/2 right-2 grid size-9 -translate-y-1/2 place-items-center rounded-full text-ink-soft hover:bg-ink/5" aria-label="Show password">

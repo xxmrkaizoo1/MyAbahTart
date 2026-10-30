@@ -20,7 +20,7 @@ class AuthTest extends TestCase
             'password_confirmation' => 'rahsia-123',
         ]);
 
-        $response->assertRedirect(route('home'));
+        $response->assertRedirect(route('verification.notice'));
         $this->assertAuthenticated();
 
         $user = User::firstWhere('email', 'nurul@example.com');
