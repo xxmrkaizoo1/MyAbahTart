@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" role="img" aria-label="Photo coming soon">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="38%" r="75%">
+      <stop offset="0" stop-color="#fff8e8"/>
+      <stop offset="1" stop-color="#fbe3bd"/>
+    </radialGradient>
+    <linearGradient id="filling" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffc24a"/>
+      <stop offset="1" stop-color="#ef8f1c"/>
+    </linearGradient>
+    <linearGradient id="crust" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f7cf7c"/>
+      <stop offset="1" stop-color="#d99a3e"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="800" height="800" fill="url(#bg)"/>
+  <circle cx="120" cy="130" r="90" fill="#fff" opacity="0.35"/>
+  <circle cx="690" cy="660" r="130" fill="#fff" opacity="0.3"/>
+  <circle cx="680" cy="150" r="26" fill="#fff" opacity="0.5"/>
+
+  <!-- plate shadow -->
+  <ellipse cx="400" cy="566" rx="170" ry="22" fill="#c98a3e" opacity="0.25"/>
+
+  <!-- tart -->
+  <g transform="translate(400 420)">
+    <!-- scalloped crust edge -->
+    <g fill="url(#crust)" stroke="#c7832d" stroke-width="4">
+      <circle cx="0" cy="-118" r="34"/>
+      <circle cx="59" cy="-102" r="34"/>
+      <circle cx="102" cy="-59" r="34"/>
+      <circle cx="118" cy="0" r="34"/>
+      <circle cx="102" cy="59" r="34"/>
+      <circle cx="59" cy="102" r="34"/>
+      <circle cx="0" cy="118" r="34"/>
+      <circle cx="-59" cy="102" r="34"/>
+      <circle cx="-102" cy="59" r="34"/>
+      <circle cx="-118" cy="0" r="34"/>
+      <circle cx="-102" cy="-59" r="34"/>
+      <circle cx="-59" cy="-102" r="34"/>
+    </g>
+    <circle r="122" fill="url(#crust)"/>
+    <circle r="96" fill="#d58a2a" opacity="0.5"/>
+    <!-- filling -->
+    <circle r="88" fill="url(#filling)"/>
+    <path d="M-52 -40 Q -20 -64 22 -58" stroke="#fff3c4" stroke-width="12" stroke-linecap="round" fill="none" opacity="0.8"/>
+    <circle cx="34" cy="20" r="7" fill="#c86a0e" opacity="0.55"/>
+    <circle cx="-18" cy="34" r="6" fill="#c86a0e" opacity="0.5"/>
+    <circle cx="10" cy="-8" r="5" fill="#c86a0e" opacity="0.45"/>
+    <circle cx="-40" cy="2" r="5" fill="#c86a0e" opacity="0.45"/>
+  </g>
+
+  <text x="400" y="640" text-anchor="middle" font-family="'Bricolage Grotesque', 'Segoe UI', Arial, sans-serif" font-size="44" font-weight="800" fill="#7a4a12">MYabah Tart Lejen</text>
+  <text x="400" y="688" text-anchor="middle" font-family="'Plus Jakarta Sans', 'Segoe UI', Arial, sans-serif" font-size="26" font-weight="600" fill="#a36a2a" letter-spacing="3">PHOTO COMING SOON</text>
+</svg>

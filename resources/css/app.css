@@ -1,0 +1,697 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+
+@theme {
+    --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-display: 'Bricolage Grotesque', ui-sans-serif, system-ui, sans-serif;
+
+    /*
+     * Colour roles. The palette names are slots, not literal colours:
+     * berry = primary, butter = accent, plum = dark surfaces, mint = success.
+     * Defaults below are the "Matcha & Apricot" theme; other themes override them further down.
+     */
+    --color-paper: #f7f5ec;
+    --color-paper-deep: #ece7d6;
+    --color-canvas: #f1f0e6;
+    --color-surface: #ffffff;
+
+    --color-berry-50: #f1f7ec;
+    --color-berry-100: #e0eed5;
+    --color-berry-200: #c3deb0;
+    --color-berry-300: #9cc683;
+    --color-berry-400: #75a95a;
+    --color-berry-500: #5a9445;
+    --color-berry-600: #4f8a3c;
+    --color-berry-700: #3d6c2f;
+    --color-berry-800: #325728;
+    --color-berry-900: #2a4722;
+
+    --color-butter-50: #fff7ef;
+    --color-butter-100: #ffead6;
+    --color-butter-200: #ffd4ad;
+    --color-butter-300: #ffbb7f;
+    --color-butter-400: #ffa65c;
+    --color-butter-500: #f38a33;
+    --color-butter-600: #cf6a17;
+
+    --color-plum-600: #44574a;
+    --color-plum-700: #2f4033;
+    --color-plum-800: #243226;
+    --color-plum-900: #1c2a1e;
+    --color-plum-950: #111a13;
+
+    --color-mint-50: #eaf7f7;
+    --color-mint-100: #cdeded;
+    --color-mint-500: #1f9a9a;
+    --color-mint-600: #157b7c;
+    --color-mint-700: #106162;
+
+    --color-ink: #1c2a1e;
+    --color-ink-soft: #5e6a5c;
+
+    --shadow-soft: 0 1px 2px rgb(28 42 30 / 0.05), 0 10px 30px -14px rgb(28 42 30 / 0.18);
+    --shadow-pop: 0 2px 6px rgb(28 42 30 / 0.08), 0 24px 48px -20px rgb(28 42 30 / 0.35);
+
+    /* Chart series for sales channels. Fixed across themes and checked for colour-blind separation. */
+    --color-online: #2a78d6;
+    --color-counter: #eb6834;
+
+    /* Shape: themes can swap these to feel sharper or rounder. */
+    --radius-button: 9999px;
+
+    --animate-marquee: marquee 30s linear infinite;
+    --animate-float: float 6s ease-in-out infinite;
+
+    @keyframes marquee {
+        from {
+            transform: translateX(0);
+        }
+        to {
+            transform: translateX(-50%);
+        }
+    }
+
+    @keyframes float {
+        0%,
+        100% {
+            transform: translateY(0);
+        }
+        50% {
+            transform: translateY(-10px);
+        }
+    }
+}
+
+/* Raspberry & Butter theme */
+[data-theme='raspberry'] {
+    --color-paper: #fff8f1;
+    --color-paper-deep: #fbeee2;
+    --color-canvas: #f7f2f4;
+
+    --color-berry-50: #fff0f4;
+    --color-berry-100: #ffe0e9;
+    --color-berry-200: #ffc2d4;
+    --color-berry-300: #ff94b2;
+    --color-berry-400: #f7608a;
+    --color-berry-500: #e83a6b;
+    --color-berry-600: #cc2257;
+    --color-berry-700: #a81847;
+    --color-berry-800: #8a1740;
+    --color-berry-900: #74173a;
+
+    --color-butter-50: #fffbeb;
+    --color-butter-100: #fff3c4;
+    --color-butter-200: #ffe68a;
+    --color-butter-300: #ffd54f;
+    --color-butter-400: #ffc42b;
+    --color-butter-500: #f5a70b;
+    --color-butter-600: #d98206;
+
+    --color-plum-600: #5a3a60;
+    --color-plum-700: #3b2440;
+    --color-plum-800: #2d1b31;
+    --color-plum-900: #211425;
+    --color-plum-950: #160c19;
+
+    --color-mint-50: #ecfbf5;
+    --color-mint-100: #d1f5e6;
+    --color-mint-500: #1fa57a;
+    --color-mint-600: #14845f;
+    --color-mint-700: #116a4e;
+
+    --color-ink: #211425;
+    --color-ink-soft: #6e5a6f;
+
+    --shadow-soft: 0 1px 2px rgb(33 20 37 / 0.05), 0 10px 30px -14px rgb(33 20 37 / 0.18);
+    --shadow-pop: 0 2px 6px rgb(33 20 37 / 0.08), 0 24px 48px -20px rgb(33 20 37 / 0.35);
+}
+
+/* Blueberry & Coral theme: cool blues with an editorial serif */
+[data-theme='blueberry'] {
+    --font-display: 'Fraunces', ui-serif, Georgia, serif;
+
+    --color-paper: #f6f8fc;
+    --color-paper-deep: #e7edf8;
+    --color-canvas: #eef2f9;
+
+    --color-berry-50: #eef4ff;
+    --color-berry-100: #dbe6ff;
+    --color-berry-200: #bccfff;
+    --color-berry-300: #8eadff;
+    --color-berry-400: #5f83f7;
+    --color-berry-500: #4263eb;
+    --color-berry-600: #3451d1;
+    --color-berry-700: #2b41a8;
+    --color-berry-800: #273987;
+    --color-berry-900: #24336c;
+
+    --color-butter-50: #fff3f0;
+    --color-butter-100: #ffe2db;
+    --color-butter-200: #ffc6b8;
+    --color-butter-300: #ffa28d;
+    --color-butter-400: #ff8266;
+    --color-butter-500: #f1603f;
+    --color-butter-600: #d4472a;
+
+    --color-plum-600: #3a4566;
+    --color-plum-700: #263050;
+    --color-plum-800: #1d2541;
+    --color-plum-900: #151b33;
+    --color-plum-950: #0c1022;
+
+    --color-mint-50: #e9faf3;
+    --color-mint-100: #c9f1e0;
+    --color-mint-500: #12a170;
+    --color-mint-600: #0c8259;
+    --color-mint-700: #0a6848;
+
+    --color-ink: #151b33;
+    --color-ink-soft: #5b6482;
+}
+
+/* Caramel Classic theme: warm, elegant and more tailored */
+[data-theme='caramel'] {
+    --font-display: 'Playfair Display', ui-serif, Georgia, serif;
+
+    --color-paper: #fbf6ee;
+    --color-paper-deep: #f2e6d3;
+    --color-canvas: #f5efe5;
+
+    --color-berry-50: #fbf3ea;
+    --color-berry-100: #f5e2cc;
+    --color-berry-200: #ebc59b;
+    --color-berry-300: #dea26a;
+    --color-berry-400: #cf8544;
+    --color-berry-500: #b86b2c;
+    --color-berry-600: #9a5422;
+    --color-berry-700: #7d431d;
+    --color-berry-800: #66381b;
+    --color-berry-900: #542f18;
+
+    --color-butter-50: #fffaf0;
+    --color-butter-100: #fdf0d2;
+    --color-butter-200: #f9dfa3;
+    --color-butter-300: #f3c96e;
+    --color-butter-400: #ebb447;
+    --color-butter-500: #d9982a;
+    --color-butter-600: #b8781d;
+
+    --color-plum-600: #5a4636;
+    --color-plum-700: #3e2f24;
+    --color-plum-800: #31241b;
+    --color-plum-900: #261b14;
+    --color-plum-950: #17100b;
+
+    --color-mint-50: #eff6f1;
+    --color-mint-100: #d7eadd;
+    --color-mint-500: #4f8f68;
+    --color-mint-600: #3d7453;
+    --color-mint-700: #315c43;
+
+    --color-ink: #261b14;
+    --color-ink-soft: #6f5e50;
+
+    --radius-xl: 0.5rem;
+    --radius-2xl: 0.625rem;
+    --radius-3xl: 0.875rem;
+    --radius-4xl: 1.125rem;
+    --radius-button: 0.5rem;
+}
+
+/* Lavender & Lime theme: soft purples, extra round and bubbly */
+[data-theme='lavender'] {
+    --font-display: 'Fredoka', ui-rounded, ui-sans-serif, system-ui, sans-serif;
+
+    --color-paper: #faf7ff;
+    --color-paper-deep: #efe8fb;
+    --color-canvas: #f4f0fb;
+
+    --color-berry-50: #f6f1ff;
+    --color-berry-100: #ece2ff;
+    --color-berry-200: #dac8ff;
+    --color-berry-300: #bf9fff;
+    --color-berry-400: #a273fb;
+    --color-berry-500: #8b50f0;
+    --color-berry-600: #7a3bd9;
+    --color-berry-700: #652fb5;
+    --color-berry-800: #542a93;
+    --color-berry-900: #452577;
+
+    --color-butter-50: #f9fde8;
+    --color-butter-100: #f0facb;
+    --color-butter-200: #e1f59a;
+    --color-butter-300: #cdec5f;
+    --color-butter-400: #b8df34;
+    --color-butter-500: #9cc61c;
+    --color-butter-600: #7a9e12;
+
+    --color-plum-600: #4b3f6b;
+    --color-plum-700: #33294f;
+    --color-plum-800: #281f40;
+    --color-plum-900: #1e1733;
+    --color-plum-950: #120d21;
+
+    --color-mint-50: #e8faf6;
+    --color-mint-100: #c8f2e8;
+    --color-mint-500: #14a38a;
+    --color-mint-600: #0e836f;
+    --color-mint-700: #0c695a;
+
+    --color-ink: #1e1733;
+    --color-ink-soft: #685f80;
+
+    --radius-2xl: 1.25rem;
+    --radius-3xl: 2rem;
+    --radius-4xl: 2.5rem;
+}
+
+/* Midnight Neon theme: dark mode with electric violet and cyan */
+[data-theme='midnight'] {
+    color-scheme: dark;
+    --font-display: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+
+    --color-paper: #0c0b14;
+    --color-paper-deep: #1a1830;
+    --color-canvas: #0f0e1a;
+    --color-surface: #16142a;
+    --color-online: #3987e5;
+    --color-counter: #d95926;
+
+    --color-berry-50: #1d1836;
+    --color-berry-100: #282050;
+    --color-berry-200: #c4b5ff;
+    --color-berry-300: #ab98ff;
+    --color-berry-400: #957cff;
+    --color-berry-500: #8466ff;
+    --color-berry-600: #7c5fff;
+    --color-berry-700: #b9a9ff;
+    --color-berry-800: #d6ccff;
+    --color-berry-900: #ece7ff;
+
+    --color-butter-50: #0f2730;
+    --color-butter-100: #12343e;
+    --color-butter-200: #7ee8f7;
+    --color-butter-300: #3dd9f0;
+    --color-butter-400: #22c8e2;
+    --color-butter-500: #2fd4ee;
+    --color-butter-600: #6be3f5;
+
+    --color-plum-600: #4a4180;
+    --color-plum-700: #3a3270;
+    --color-plum-800: #2d2660;
+    --color-plum-900: #221c4a;
+    --color-plum-950: #05040a;
+
+    --color-mint-50: #0d2a26;
+    --color-mint-100: #123a33;
+    --color-mint-500: #2dd4b0;
+    --color-mint-600: #34d9b5;
+    --color-mint-700: #5fe6c7;
+
+    --color-rose-50: #3a1522;
+    --color-rose-100: #4a1a2b;
+    --color-rose-200: #7a2a42;
+    --color-rose-700: #fb7a95;
+    --color-rose-800: #fda4b6;
+    --color-sky-50: #0d2533;
+    --color-sky-700: #7dd3fc;
+
+    --color-ink: #eeecf8;
+    --color-ink-soft: #a29dbd;
+
+    --shadow-soft: 0 1px 2px rgb(0 0 0 / 0.4), 0 12px 32px -14px rgb(0 0 0 / 0.7);
+    --shadow-pop: 0 2px 6px rgb(0 0 0 / 0.5), 0 24px 48px -18px rgb(0 0 0 / 0.8);
+}
+
+/* Decorative glows are softer on dark backgrounds so text stays readable. */
+[data-theme='midnight'] .blur-3xl {
+    opacity: 0.4;
+}
+
+/* Mono Volt theme: minimal black and white with a lime spark */
+[data-theme='mono'] {
+    --font-display: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+
+    --color-paper: #f4f4f1;
+    --color-paper-deep: #e7e7e2;
+    --color-canvas: #ededea;
+
+    --color-berry-50: #f0f0ec;
+    --color-berry-100: #e4e4df;
+    --color-berry-200: #c9c9c2;
+    --color-berry-300: #a3a39b;
+    --color-berry-400: #6f6f68;
+    --color-berry-500: #333331;
+    --color-berry-600: #111111;
+    --color-berry-700: #000000;
+    --color-berry-800: #000000;
+    --color-berry-900: #000000;
+
+    --color-butter-50: #fbffe8;
+    --color-butter-100: #f4ffc4;
+    --color-butter-200: #e8ff8a;
+    --color-butter-300: #d4ff3a;
+    --color-butter-400: #c2f01f;
+    --color-butter-500: #8fb800;
+    --color-butter-600: #6a8a00;
+
+    --color-plum-600: #3a3a3a;
+    --color-plum-700: #262626;
+    --color-plum-800: #1a1a1a;
+    --color-plum-900: #0a0a0a;
+    --color-plum-950: #000000;
+
+    --color-mint-50: #e9f8f0;
+    --color-mint-100: #cdeedd;
+    --color-mint-500: #16a265;
+    --color-mint-600: #0f8452;
+    --color-mint-700: #0b6941;
+
+    --color-ink: #0a0a0a;
+    --color-ink-soft: #5f5f5a;
+
+    --shadow-soft: 0 1px 2px rgb(0 0 0 / 0.06), 0 10px 30px -16px rgb(0 0 0 / 0.2);
+    --shadow-pop: 0 2px 6px rgb(0 0 0 / 0.08), 0 24px 48px -22px rgb(0 0 0 / 0.35);
+
+    --radius-xl: 0.375rem;
+    --radius-2xl: 0.5rem;
+    --radius-3xl: 0.75rem;
+    --radius-4xl: 1rem;
+    --radius-button: 0.5rem;
+}
+
+/* Aurora Glow theme: airy teal and pink glow */
+[data-theme='aurora'] {
+    --font-display: 'Sora', ui-sans-serif, system-ui, sans-serif;
+
+    --color-paper: #f3fbfa;
+    --color-paper-deep: #e1f3f1;
+    --color-canvas: #eaf6f5;
+
+    --color-berry-50: #e8faf8;
+    --color-berry-100: #cbf3ef;
+    --color-berry-200: #9be6df;
+    --color-berry-300: #5fd2c8;
+    --color-berry-400: #2bb9b0;
+    --color-berry-500: #13a8a1;
+    --color-berry-600: #0f9f9a;
+    --color-berry-700: #0b7a77;
+    --color-berry-800: #0c6260;
+    --color-berry-900: #0d5150;
+
+    --color-butter-50: #fff1f7;
+    --color-butter-100: #ffe0ee;
+    --color-butter-200: #ffc2dd;
+    --color-butter-300: #ff9cc8;
+    --color-butter-400: #ff6fae;
+    --color-butter-500: #f04893;
+    --color-butter-600: #cf2f77;
+
+    --color-plum-600: #2f5560;
+    --color-plum-700: #1c4048;
+    --color-plum-800: #123139;
+    --color-plum-900: #0b2530;
+    --color-plum-950: #06161d;
+
+    --color-mint-50: #edf7ff;
+    --color-mint-100: #d4ebff;
+    --color-mint-500: #3b82f6;
+    --color-mint-600: #2563eb;
+    --color-mint-700: #1d4ed8;
+
+    --color-ink: #0b2530;
+    --color-ink-soft: #557079;
+
+    --radius-2xl: 1.125rem;
+    --radius-3xl: 1.75rem;
+    --radius-4xl: 2.25rem;
+}
+
+@layer base {
+    html {
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+        @apply bg-paper font-sans text-ink antialiased;
+        background-image:
+            radial-gradient(48rem 32rem at 100% -8%, color-mix(in oklab, var(--color-butter-200) 38%, transparent), transparent 70%),
+            radial-gradient(44rem 36rem at -12% 22%, color-mix(in oklab, var(--color-berry-200) 30%, transparent), transparent 70%);
+        background-attachment: fixed;
+    }
+
+    ::selection {
+        @apply bg-butter-300 text-plum-900;
+    }
+
+    h1,
+    h2,
+    h3 {
+        @apply font-display tracking-tight;
+    }
+
+    :focus-visible {
+        @apply outline-2 outline-offset-2 outline-berry-500;
+    }
+}
+
+@utility card {
+    @apply rounded-3xl bg-surface shadow-soft ring-1 ring-ink/[0.06];
+}
+
+@utility btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-button px-5 py-2.5 text-sm font-semibold transition select-none active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-50;
+}
+
+@utility btn-primary {
+    @apply btn bg-berry-600 bg-linear-to-b from-berry-500 to-berry-600 text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.22),0_10px_24px_-10px_var(--color-berry-600)] hover:brightness-110;
+}
+
+@utility btn-dark {
+    @apply btn bg-plum-900 text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.08)] hover:bg-plum-700;
+}
+
+@utility btn-butter {
+    @apply btn bg-butter-300 text-plum-900 hover:bg-butter-400;
+}
+
+@utility btn-outline {
+    @apply btn bg-surface/80 text-ink ring-1 ring-ink/15 backdrop-blur hover:bg-paper-deep;
+}
+
+@utility btn-ghost {
+    @apply btn text-ink-soft hover:bg-ink/5 hover:text-ink;
+}
+
+@utility input {
+    @apply block w-full rounded-2xl border-0 bg-surface px-4 py-3 text-sm text-ink ring-1 ring-ink/12 transition placeholder:text-ink-soft/60 focus:ring-2 focus:ring-berry-500 focus:outline-none;
+}
+
+@utility label {
+    @apply mb-1.5 block text-sm font-semibold text-ink;
+}
+
+@utility eyebrow {
+    @apply inline-flex items-center gap-2 text-xs font-bold tracking-[0.16em] text-berry-600 uppercase before:inline-block before:size-1.5 before:shrink-0 before:rounded-full before:bg-butter-400 before:content-[''];
+}
+
+@utility chip {
+    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] leading-none font-bold;
+}
+
+@utility section-title {
+    @apply font-display text-2xl leading-tight font-bold tracking-tight text-ink sm:text-[2rem];
+}
+
+@utility container-page {
+    @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+}
+
+@utility scrollbar-none {
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
+}
+
+/*
+ * Motion: page transitions, scroll reveals, drawers and small entrances.
+ * Everything below is skipped for visitors who prefer reduced motion.
+ */
+@view-transition {
+    navigation: auto;
+}
+
+/* The sliding pill in the main navigation; also used to morph between pages. */
+[data-nav-pill] {
+    view-transition-name: nav-pill;
+    transition:
+        translate 0.45s cubic-bezier(0.3, 1.3, 0.5, 1),
+        width 0.45s cubic-bezier(0.3, 1.3, 0.5, 1);
+}
+
+[data-site-header] {
+    view-transition-name: site-header;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    ::view-transition-old(root) {
+        animation: page-out 0.2s ease-in both;
+    }
+
+    ::view-transition-new(root) {
+        animation: page-in 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+    }
+
+    ::view-transition-group(nav-pill) {
+        animation-duration: 0.45s;
+        animation-timing-function: cubic-bezier(0.3, 1.2, 0.5, 1);
+    }
+
+    /* Scroll reveal: app.js adds .reveal, then .is-revealed once the element is on screen. */
+    .reveal:not(.is-revealed) {
+        opacity: 0;
+    }
+
+    .reveal.is-revealed {
+        animation: rise-in 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+        animation-delay: var(--reveal-delay, 0ms);
+    }
+
+    /* Drawers slide in and out; their links follow one after another. */
+    [data-drawer]:not(.hidden) > :first-child {
+        animation: fade-in 0.25s ease both;
+    }
+
+    [data-drawer]:not(.hidden) > :last-child {
+        animation: slide-in-left 0.4s cubic-bezier(0.2, 0.9, 0.3, 1) both;
+    }
+
+    [data-drawer][data-closing] > :first-child {
+        animation: fade-out 0.22s ease both;
+    }
+
+    [data-drawer][data-closing] > :last-child {
+        animation: slide-out-left 0.22s ease-in both;
+    }
+
+    [data-drawer]:not(.hidden, [data-closing]) nav > * {
+        animation: rise-in 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+        animation-delay: calc(120ms + var(--i, 0) * 55ms);
+    }
+
+    /* Dropdown menus and accordions. */
+    details[open] > .card {
+        transform-origin: top right;
+        animation: pop-in 0.22s cubic-bezier(0.2, 1.2, 0.4, 1) both;
+    }
+
+    details[open] > summary ~ :not(.card) {
+        animation: fade-down 0.3s ease-out both;
+    }
+
+    /* Toasts bounce in. */
+    [data-flash] > * {
+        animation: toast-in 0.5s cubic-bezier(0.2, 1.4, 0.4, 1) both;
+    }
+
+    /* Header lifts once the page scrolls. */
+    [data-header-bar] {
+        transition:
+            box-shadow 0.3s ease,
+            background-color 0.3s ease;
+    }
+
+    [data-site-header][data-scrolled] [data-header-bar] {
+        box-shadow: 0 14px 36px -20px rgb(0 0 0 / 0.45);
+    }
+
+    /* Buttons rise slightly on hover. */
+    :is(.btn, .btn-primary, .btn-dark, .btn-butter, .btn-outline):not(:disabled):hover {
+        translate: 0 -2px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    [data-nav-pill] {
+        transition: none;
+    }
+
+    ::view-transition-group(*),
+    ::view-transition-old(*),
+    ::view-transition-new(*) {
+        animation: none !important;
+    }
+}
+
+@keyframes page-out {
+    to {
+        opacity: 0;
+        translate: 0 -8px;
+    }
+}
+
+@keyframes page-in {
+    from {
+        opacity: 0;
+        translate: 0 14px;
+    }
+}
+
+@keyframes rise-in {
+    from {
+        opacity: 0;
+        translate: 0 22px;
+    }
+}
+
+@keyframes fade-in {
+    from {
+        opacity: 0;
+    }
+}
+
+@keyframes fade-out {
+    to {
+        opacity: 0;
+    }
+}
+
+@keyframes slide-in-left {
+    from {
+        translate: -100% 0;
+    }
+}
+
+@keyframes slide-out-left {
+    to {
+        translate: -100% 0;
+    }
+}
+
+@keyframes pop-in {
+    from {
+        opacity: 0;
+        scale: 0.92;
+        translate: 0 -6px;
+    }
+}
+
+@keyframes fade-down {
+    from {
+        opacity: 0;
+        translate: 0 -6px;
+    }
+}
+
+@keyframes toast-in {
+    from {
+        opacity: 0;
+        scale: 0.9;
+        translate: 0 16px;
+    }
+}
