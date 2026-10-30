@@ -45,17 +45,58 @@
                 </div>
             </section>
 
+            @php
+                $checked = fn (string $key) => old($key, $errors->any() ? null : $storefront->get($key)) === '1';
+            @endphp
+            <section class="card p-5 sm:p-7" data-topbar-editor>
+                <div class="flex items-start gap-4">
+                    <div class="min-w-0 flex-1">
+                        <h2 class="font-display text-xl font-bold">Top bar</h2>
+                        <p class="text-sm text-ink-soft">The thin strip above the menu on every shop page.</p>
+                    </div>
+                    <label class="flex cursor-pointer items-center gap-2">
+                        <input type="hidden" name="topbar_enabled" value="0">
+                        <input type="checkbox" name="topbar_enabled" value="1" @checked($checked('topbar_enabled')) data-topbar-input class="peer sr-only">
+                        <span class="relative h-7 w-12 shrink-0 rounded-full bg-ink/15 transition peer-checked:bg-mint-500 after:absolute after:top-1 after:left-1 after:size-5 after:rounded-full after:bg-white after:shadow after:transition peer-checked:after:translate-x-5"></span>
+                        <span class="sr-only">Show the top bar</span>
+                    </label>
+                </div>
+
+                <div class="mt-5 overflow-hidden rounded-2xl ring-1 ring-ink/10">
+                    <p class="bg-paper-deep px-3 py-1.5 text-[11px] font-bold tracking-wide text-ink-soft uppercase">Preview</p>
+                    <div data-topbar-preview class="flex items-center justify-center gap-2 bg-plum-900 px-4 py-2.5 text-center text-xs font-semibold tracking-wide text-white">
+                        <x-icon name="truck" class="size-4 shrink-0 text-butter-300" />
+                        <span data-topbar-text></span>
+                    </div>
+                    <p data-topbar-hidden class="hidden bg-paper px-4 py-2.5 text-center text-xs text-ink-soft">The top bar is switched off.</p>
+                </div>
+
+                <div class="mt-5 grid gap-4 sm:grid-cols-[auto_1fr] sm:items-end">
+                    <div class="rounded-2xl bg-mint-50 p-3 ring-1 ring-mint-500/20">
+                        <label class="flex cursor-pointer items-center gap-2 text-sm font-bold">
+                            <input type="hidden" name="topbar_free_delivery" value="0">
+                            <input type="checkbox" name="topbar_free_delivery" value="1" @checked($checked('topbar_free_delivery')) data-topbar-input class="rounded border-ink/20 text-berry-600">
+                            Show “Free delivery over”
+                        </label>
+                        <div class="mt-2 flex items-center gap-2">
+                            <span class="text-sm font-semibold text-ink-soft">RM</span>
+                            <input id="delivery_free_over" name="delivery_free_over" type="number" step="0.01" min="0" value="{{ $field('delivery_free_over') }}" data-topbar-input class="input w-32 bg-surface" aria-label="Free delivery amount">
+                        </div>
+                        @error('delivery_free_over') <p class="mt-1 text-sm text-rose-700">{{ $message }}</p> @enderror
+                    </div>
+                    <div>
+                        <label for="announcement" class="label">Message <span class="font-normal text-ink-soft">· leave blank to hide</span></label>
+                        <input id="announcement" name="announcement" value="{{ $field('announcement') }}" maxlength="120" placeholder="e.g. Raya pre-orders now open!" data-topbar-input class="input bg-paper">
+                    </div>
+                </div>
+                <p class="mt-3 text-xs text-ink-soft">The free-delivery amount is the same one as on the Delivery page. It only shows while Standard delivery is switched on and the amount is above 0.</p>
+            </section>
+
             <section class="card p-5 sm:p-7">
-                <h2 class="font-display text-xl font-bold">Announcement & scrolling strip</h2>
-                <div class="mt-5 grid gap-4">
-                    <div>
-                        <label for="announcement" class="label">Top bar message <span class="font-normal text-ink-soft">· shown after the free-delivery note</span></label>
-                        <input id="announcement" name="announcement" value="{{ $field('announcement') }}" maxlength="120" placeholder="e.g. Raya pre-orders now open!" class="input bg-paper">
-                    </div>
-                    <div>
-                        <label for="ticker" class="label">Scrolling strip <span class="font-normal text-ink-soft">· one phrase per line</span></label>
-                        <textarea id="ticker" name="ticker" rows="4" maxlength="1000" placeholder="Leave blank to show your product names" class="input bg-paper">{{ $field('ticker') }}</textarea>
-                    </div>
+                <h2 class="font-display text-xl font-bold">Scrolling strip</h2>
+                <div class="mt-5">
+                    <label for="ticker" class="label">Phrases <span class="font-normal text-ink-soft">· one phrase per line</span></label>
+                    <textarea id="ticker" name="ticker" rows="4" maxlength="1000" placeholder="Leave blank to show your product names" class="input bg-paper">{{ $field('ticker') }}</textarea>
                 </div>
             </section>
 

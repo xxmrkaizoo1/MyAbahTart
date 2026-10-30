@@ -15,6 +15,8 @@ class Storefront
      * @var array<string, string>
      */
     public const DEFAULTS = [
+        'topbar_enabled' => '1',
+        'topbar_free_delivery' => '1',
         'announcement' => 'Every order prepared fresh in Bangsar',
         'hero_badge' => 'Prepared fresh for every order',
         'hero_title_start' => 'Tarts worth',

@@ -670,6 +670,38 @@ document.querySelectorAll('[data-size-stock-total]').forEach((total) => {
     sync();
 });
 
+// Live preview of the shop's top bar on the Storefront page.
+document.querySelectorAll('[data-topbar-editor]').forEach((editor) => {
+    const field = (name) => editor.querySelector(`[data-topbar-input][name="${name}"]`);
+    const preview = editor.querySelector('[data-topbar-preview]');
+    const hiddenNote = editor.querySelector('[data-topbar-hidden]');
+    const text = editor.querySelector('[data-topbar-text]');
+
+    const update = () => {
+        const amount = parseFloat(field('delivery_free_over').value) || 0;
+        const parts = [];
+
+        if (field('topbar_free_delivery').checked && amount > 0) {
+            parts.push(`Free delivery over RM ${amount.toFixed(2)}`);
+        }
+
+        if (field('announcement').value.trim() !== '') {
+            parts.push(field('announcement').value.trim());
+        }
+
+        const visible = field('topbar_enabled').checked && parts.length > 0;
+        text.textContent = parts.join(' · ');
+        preview.classList.toggle('hidden', !visible);
+        preview.classList.toggle('flex', visible);
+        hiddenNote.textContent = field('topbar_enabled').checked ? 'Nothing to show: add a message or switch on the free-delivery note.' : 'The top bar is switched off.';
+        hiddenNote.classList.toggle('hidden', visible);
+    };
+
+    editor.querySelectorAll('[data-topbar-input]').forEach((input) => input.addEventListener('input', update));
+    editor.querySelectorAll('[data-topbar-input]').forEach((input) => input.addEventListener('change', update));
+    update();
+});
+
 // Preview an uploaded product photo before saving.
 document.querySelectorAll('[data-image-input]').forEach((input) => {
     input.addEventListener('change', () => {

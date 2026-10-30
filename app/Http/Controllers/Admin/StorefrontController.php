@@ -19,6 +19,9 @@ class StorefrontController extends Controller
     public function update(Request $request, Storefront $storefront): RedirectResponse
     {
         $validated = $request->validate([
+            'topbar_enabled' => ['sometimes', 'boolean'],
+            'topbar_free_delivery' => ['sometimes', 'boolean'],
+            'delivery_free_over' => ['sometimes', 'nullable', 'numeric', 'min:0', 'max:100000'],
             'announcement' => ['nullable', 'string', 'max:120'],
             'hero_badge' => ['nullable', 'string', 'max:60'],
             'hero_title_start' => ['nullable', 'string', 'max:40'],
@@ -40,6 +43,16 @@ class StorefrontController extends Controller
             'address' => ['nullable', 'string', 'max:200'],
             'opening_hours' => ['nullable', 'string', 'max:80'],
         ]);
+
+        foreach (['topbar_enabled', 'topbar_free_delivery'] as $toggle) {
+            if ($request->has($toggle)) {
+                $validated[$toggle] = $request->boolean($toggle) ? '1' : '0';
+            }
+        }
+
+        if ($request->has('delivery_free_over')) {
+            $validated['delivery_free_over'] = number_format((float) $validated['delivery_free_over'], 2, '.', '');
+        }
 
         if ($request->boolean('remove_hero_image') || $request->hasFile('hero_image_file')) {
             if ($storefront->get('hero_image') !== '') {

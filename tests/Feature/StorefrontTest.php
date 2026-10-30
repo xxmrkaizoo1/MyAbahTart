@@ -4,10 +4,10 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use App\Services\Storefront;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class StorefrontTest extends TestCase
 {
@@ -81,6 +81,34 @@ class StorefrontTest extends TestCase
      * @param  array<string, mixed>  $overrides
      * @return array<string, mixed>
      */
+    public function test_the_top_bar_can_be_edited_from_the_storefront_page(): void
+    {
+        $this->actingAs(User::factory()->admin()->create());
+
+        $this->get(route('admin.storefront.edit'))->assertOk()->assertSee('Top bar')->assertSee('Show “Free delivery over”', false);
+
+        $this->put(route('admin.storefront.update'), $this->form([
+            'delivery_free_over' => '99',
+            'announcement' => 'Raya pre-orders now open!',
+        ]))->assertSessionHasNoErrors();
+
+        $this->get(route('home'))->assertSee('Free delivery over RM 99.00')->assertSee('Raya pre-orders now open!');
+
+        $this->put(route('admin.storefront.update'), $this->form(['topbar_free_delivery' => '0', 'delivery_free_over' => '99', 'announcement' => 'Closed on Friday']))->assertSessionHasNoErrors();
+
+        $this->get(route('home'))->assertDontSee('Free delivery over')->assertSee('Closed on Friday');
+        $this->assertSame('99.00', app(Storefront::class)->get('delivery_free_over'));
+    }
+
+    public function test_the_top_bar_can_be_switched_off(): void
+    {
+        $this->actingAs(User::factory()->admin()->create())
+            ->put(route('admin.storefront.update'), $this->form(['topbar_enabled' => '0', 'announcement' => 'Closed on Friday']))
+            ->assertSessionHasNoErrors();
+
+        $this->get(route('home'))->assertDontSee('Closed on Friday')->assertDontSee('Free delivery over');
+    }
+
     private function form(array $overrides = []): array
     {
         return [...Storefront::DEFAULTS, ...$overrides];

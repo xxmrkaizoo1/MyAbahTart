@@ -26,13 +26,15 @@
     <body class="flex min-h-dvh flex-col">
         <x-flash />
 
-        <div class="bg-plum-900 text-white">
-            <p class="container-page flex items-center justify-center gap-2 py-2 text-center text-[11px] font-semibold tracking-wide sm:text-xs">
-                <x-icon name="truck" class="size-4 shrink-0 text-butter-300" />
-                @php($freeOver = \App\Enums\DeliveryMethod::freeDeliveryThreshold())
-                <span>@if ($freeOver)Free delivery over @rm($freeOver)@endif @if ($storefront->get('announcement') !== '')<span @class(['hidden sm:inline' => $freeOver])>{{ $freeOver ? '· ' : '' }}{{ $storefront->get('announcement') }}</span>@endif</span>
-            </p>
-        </div>
+        @php($freeOver = $storefront->get('topbar_free_delivery') === '1' ? \App\Enums\DeliveryMethod::freeDeliveryThreshold() : null)
+        @if ($storefront->get('topbar_enabled') === '1' && ($freeOver || $storefront->get('announcement') !== ''))
+            <div class="bg-plum-900 text-white">
+                <p class="container-page flex items-center justify-center gap-2 py-2 text-center text-[11px] font-semibold tracking-wide sm:text-xs">
+                    <x-icon name="truck" class="size-4 shrink-0 text-butter-300" />
+                    <span>@if ($freeOver)Free delivery over @rm($freeOver)@endif @if ($storefront->get('announcement') !== '')<span @class(['hidden sm:inline' => $freeOver])>{{ $freeOver ? '· ' : '' }}{{ $storefront->get('announcement') }}</span>@endif</span>
+                </p>
+            </div>
+        @endif
 
         <header data-site-header class="sticky top-0 z-40 px-2 pt-2 sm:px-4 sm:pt-3">
             <div data-header-bar class="mx-auto flex h-16 max-w-7xl items-center gap-3 rounded-4xl bg-surface/75 px-3 ring-1 ring-ink/[0.07] backdrop-blur-xl sm:h-[4.5rem] sm:px-5 lg:gap-6">
