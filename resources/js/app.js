@@ -186,7 +186,7 @@ document.querySelectorAll('[data-autosubmit]').forEach((control) => {
 
 // Quantity steppers: <div data-stepper> with [data-step="-1|1"] buttons and an input.
 document.querySelectorAll('[data-stepper]').forEach((stepper) => {
-    const input = stepper.querySelector('input');
+    const input = stepper.querySelector('input[type="number"]');
     const min = Number(input.min || 0);
     const max = Number(input.max || 99);
 

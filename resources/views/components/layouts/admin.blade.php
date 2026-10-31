@@ -33,7 +33,7 @@
         <x-flash />
 
         <header data-site-header class="bg-plum-900 text-white print:hidden">
-            <div class="container-page flex h-16 items-center gap-3 lg:h-[72px] lg:gap-8">
+            <div class="container-page flex h-16 items-center gap-3 lg:h-[72px] lg:gap-6 2xl:max-w-[1600px]">
                 <button type="button" data-drawer-open="admin-drawer" class="-ml-2 grid size-11 place-items-center rounded-full hover:bg-white/10 lg:hidden" aria-label="Open menu">
                     <x-icon name="menu" class="size-6" />
                 </button>
@@ -45,7 +45,7 @@
                     </span>
                 </a>
 
-                <nav data-nav-track class="hidden items-center gap-1 rounded-button bg-white/5 p-1 ring-1 ring-white/10 lg:flex" aria-label="Admin">
+                <nav data-nav-track class="hidden min-w-0 items-center gap-1 rounded-button bg-white/5 p-1 ring-1 ring-white/10 lg:flex" aria-label="Admin">
                     @foreach ($navigation as [$route, $label, $icon, $pattern])
                         @php($isActive = request()->routeIs($pattern))
                         <a href="{{ route($route) }}" title="{{ $label }}" @if ($isActive) aria-current="page" data-lit @endif @class([
@@ -56,7 +56,7 @@
                             @if ($isActive)
                                 <span data-nav-pill class="absolute inset-y-0 left-0 -z-10 w-full rounded-button bg-white shadow-md" aria-hidden="true"></span>
                             @endif
-                            <x-icon :name="$icon" class="size-4.5 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:-rotate-12" /> <span class="lg:max-2xl:sr-only">{{ $label }}</span>
+                            <x-icon :name="$icon" class="size-4.5 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:-rotate-12" /> <span @class(['lg:max-2xl:sr-only' => ! $isActive])>{{ $label }}</span>
                             @if ($route === 'admin.orders.index')
                                 <span data-live="nav-orders" class="contents">@if ($activeOrderCount > 0)<span class="rounded-full bg-berry-500 px-1.5 py-0.5 text-[10px] font-extrabold text-white">{{ $activeOrderCount }}</span>@endif</span>
                             @endif
@@ -68,16 +68,17 @@
                 </nav>
 
                 <div class="ml-auto flex items-center gap-2">
-                    <a href="{{ route('home') }}" title="View shop" class="hidden items-center gap-2 rounded-full px-3 py-2 text-sm font-semibold whitespace-nowrap text-white/70 hover:bg-white/10 hover:text-white md:flex">
-                        <x-icon name="store" class="size-4.5" /> <span class="lg:max-2xl:sr-only">View shop</span>
+                    <a href="{{ route('home') }}" title="View shop" class="hidden items-center gap-2 rounded-full px-3 py-2 text-sm font-semibold whitespace-nowrap text-white/70 hover:bg-white/10 hover:text-white md:flex lg:px-2.5">
+                        <x-icon name="store" class="size-4.5" /> <span class="lg:sr-only">View shop</span>
                     </a>
                     <details class="group relative">
-                        <summary class="flex cursor-pointer list-none items-center gap-2 rounded-full p-1 hover:bg-white/10 sm:pr-3">
-                            <span class="grid size-9 place-items-center rounded-full bg-butter-300 text-xs font-extrabold text-plum-900">{{ auth()->user()->initials() }}</span>
-                            <span class="hidden text-sm font-semibold sm:block">{{ auth()->user()->firstName() }}</span>
+                        <summary class="flex cursor-pointer list-none items-center gap-2 rounded-full p-1 hover:bg-white/10 sm:pr-3 lg:pr-1" title="{{ auth()->user()->name }}">
+                            <span class="grid size-9 shrink-0 place-items-center rounded-full bg-butter-300 text-xs font-extrabold text-plum-900">{{ auth()->user()->initials() }}</span>
+                            <span class="hidden text-sm font-semibold whitespace-nowrap sm:block lg:hidden">{{ auth()->user()->firstName() }}</span>
                         </summary>
                         <div class="card absolute right-0 z-50 mt-2 w-64 p-2 text-sm text-ink">
-                            <p class="truncate px-3 py-2 text-xs text-ink-soft">{{ auth()->user()->email }}</p>
+                            <p class="truncate px-3 pt-2 font-bold">{{ auth()->user()->name }}</p>
+                            <p class="truncate px-3 pb-2 text-xs text-ink-soft">{{ auth()->user()->email }}</p>
                             <div class="border-y border-ink/5 px-3 py-3">
                                 <p class="mb-2 text-xs font-bold text-ink-soft">Colour theme</p>
                                 <x-theme-switcher class="flex-col items-stretch" />
