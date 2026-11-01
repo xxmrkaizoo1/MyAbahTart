@@ -1,58 +1,172 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# MYabah Tart Lejen
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+An online shop and point-of-sale system for a tart bakery, built with Laravel 13. Customers browse the menu, order for delivery or pickup and pay online. The shop team runs orders, stock, the counter (POS), refunds and vouchers from an admin panel, and a JSON API lets an admin mobile app do the same.
 
-## About Laravel
+## Features
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+**Storefront (customers)**
+- Menu with collections, product sizes, photos and reviews
+- Cart, vouchers and live delivery quotes from Lalamove
+- Checkout with standard, express or pickup delivery
+- Online payment through Billplz. Orders left unpaid for 30 minutes are cancelled automatically.
+- Accounts with email verification, password reset and a profile page
+- Order history with cancel, reorder and refund requests
+- Live order status updates
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+**Admin panel (`/admin`)**
+- Dashboard with shop insights
+- Order management (received → preparing → ready → completed / cancelled)
+- Products, stock and restocking, collections
+- Point of sale for counter sales with receipts and a configurable counter menu
+- Sales report split by online and counter channels
+- Refunds, vouchers, review moderation
+- Delivery settings and storefront customisation, including colour themes
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+**Admin mobile API (`/api/admin`)**
+- Token login for administrators only
+- Read endpoints that return the same data as the admin panel pages
+- Write endpoints that go through the admin panel's own controllers, so the app follows the same rules
 
-## Learning Laravel
+## Tech stack
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+- PHP 8.3, Laravel 13
+- Blade, Tailwind CSS 4, Vite
+- SQLite by default; MySQL works too
+- Billplz (payments), Lalamove (delivery)
+- PHPUnit, Laravel Pint
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Getting started
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+Requirements: PHP 8.3+, Composer, Node.js and npm.
 
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+git clone <repo-url> MyAbahTartLejen
+cd MyAbahTartLejen
+composer run setup
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+`composer run setup` installs dependencies, creates `.env`, generates the app key, runs the migrations and builds the frontend assets.
 
-## Contributing
+Load the demo catalogue, orders and accounts:
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```bash
+php artisan db:seed
+```
 
-## Code of Conduct
+The seeded admin account is defined in [database/seeders/ShopDemoSeeder.php](database/seeders/ShopDemoSeeder.php). Change its password before using it anywhere public.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Start the development processes (web server, Vite and friends):
 
-## Security Vulnerabilities
+```bash
+composer run dev
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Then open http://localhost:8000. If you use Laragon, the site is also served at `http://myabahtartlejen.test`.
+
+### Scheduler
+
+Unpaid online orders are cancelled by the `orders:cancel-unpaid` command, which runs every five minutes. Keep the scheduler running locally:
+
+```bash
+php artisan schedule:work
+```
+
+In production, add the usual cron entry:
+
+```
+* * * * * cd /path/to/app && php artisan schedule:run >> /dev/null 2>&1
+```
+
+## Configuration
+
+Set these in `.env`:
+
+| Variable | Purpose |
+| --- | --- |
+| `APP_TIMEZONE` | Defaults to `Asia/Kuala_Lumpur` |
+| `BILLPLZ_API_KEY`, `BILLPLZ_COLLECTION_ID`, `BILLPLZ_X_SIGNATURE` | Billplz online payments |
+| `BILLPLZ_SANDBOX` | `true` to use the Billplz sandbox |
+| `LALAMOVE_API_KEY`, `LALAMOVE_API_SECRET` | Lalamove delivery quotes |
+| `LALAMOVE_SANDBOX`, `LALAMOVE_MARKET` | Lalamove environment and market (default `MY`) |
+| `MAIL_*` | Mail for email verification and password resets (default: `log`) |
+| `PUBLIC_UPLOADS_IN_PUBLIC` | `true` on hosts without symlink support (e.g. InfinityFree) to save uploads straight into `public/storage` |
+
+Otherwise, run `php artisan storage:link` so uploaded product photos are publicly reachable.
+
+Billplz needs to reach `POST /payments/billplz/callback`, so use a public URL (or a tunnel) when testing payments locally.
+
+## Admin mobile API
+
+All endpoints live under `/api/admin` and always respond with JSON.
+
+Sign in to get a token:
+
+```http
+POST /api/admin/login
+Content-Type: application/json
+
+{ "email": "admin@example.com", "password": "secret", "device_name": "My phone" }
+```
+
+Send the token with every other request:
+
+```http
+Authorization: Bearer <token>
+```
+
+| Area | Endpoints |
+| --- | --- |
+| Account | `GET /me`, `POST /logout`, `GET /options` |
+| Dashboard | `GET /dashboard` |
+| Orders | `GET /orders`, `GET /orders/{order}`, `PATCH /orders/{order}/status` |
+| Products | `GET/POST /products`, `GET/POST/DELETE /products/{product}`, `PATCH /products/{product}/stock`, `POST /products/{product}/restock` |
+| Collections | `GET/POST /collections`, `POST/DELETE /collections/{category}` |
+| Sales | `GET /sales` |
+| Storefront | `GET/POST /storefront`, `DELETE /reviews/{review}` |
+| Delivery | `GET/PUT /delivery` |
+| POS | `GET /pos`, `POST /pos/sales`, `GET /pos/sales/{order}`, `GET/PUT /pos/menu` |
+| Refunds | `GET /refunds`, `POST /orders/{order}/refunds`, `PATCH /refunds/{refund}` |
+| Vouchers | `GET/POST /vouchers`, `PATCH/DELETE /vouchers/{voucher}` |
+
+Product and collection updates use `POST` instead of `PUT` so photos can be sent as multipart form data. Run `php artisan route:list --path=api` for the full list.
+
+## Testing
+
+```bash
+composer run test
+```
+
+Or run a single file:
+
+```bash
+php artisan test --compact tests/Feature/AdminApiTest.php
+```
+
+Format PHP code with Pint before committing:
+
+```bash
+vendor/bin/pint --dirty
+```
+
+## Project structure
+
+```
+app/
+├── Console/Commands/      # orders:cancel-unpaid
+├── Enums/                 # Order status, payment, delivery, refund, theme…
+├── Http/Controllers/
+│   ├── Admin/             # Admin panel
+│   ├── Api/               # Admin mobile API
+│   └── Auth/              # Login, register, password reset, email verification
+├── Http/Resources/        # API resources
+├── Models/
+└── Services/              # Billplz, Lalamove, Cart, Storefront, ShopInsights…
+database/seeders/          # Catalogue and demo data
+resources/views/           # Blade views
+routes/                    # web.php, api.php, console.php
+tests/Feature/
+```
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+MIT
