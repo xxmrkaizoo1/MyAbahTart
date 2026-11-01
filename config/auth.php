@@ -42,6 +42,12 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+
+        // Bearer tokens issued to the admin mobile app (see App\Models\ApiToken).
+        'api' => [
+            'driver' => 'api-token',
+            'provider' => 'users',
+        ],
     ],
 
     /*

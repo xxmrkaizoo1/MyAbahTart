@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Enums\Theme;
+use App\Models\ApiToken;
 use App\Models\Category;
 use App\Models\Order;
 use App\Models\Refund;
@@ -10,7 +11,9 @@ use App\Services\Cart;
 use App\Services\Storefront;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Auth\Notifications\VerifyEmail;
+use Illuminate\Http\Request;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\View;
@@ -51,6 +54,16 @@ class AppServiceProvider extends ServiceProvider
             ->line('We got a request to reset the password for your account.')
             ->action('Choose a new password', route('password.reset', ['token' => $token, 'email' => $notifiable->getEmailForPasswordReset()]))
             ->line('The link works for '.config('auth.passwords.users.expire').' minutes. If you didn’t ask for this, your password stays the same and you can ignore this email.'));
+
+        Auth::viaRequest('api-token', function (Request $request) {
+            $token = ApiToken::findByPlainToken($request->bearerToken());
+
+            if ($token !== null && ($token->last_used_at === null || $token->last_used_at->lt(now()->subMinute()))) {
+                $token->forceFill(['last_used_at' => now()])->save();
+            }
+
+            return $token?->user;
+        });
 
         Blade::directive('rm', fn (string $expression) => "<?php echo 'RM '.number_format((float) ({$expression}), 2); ?>");
 
