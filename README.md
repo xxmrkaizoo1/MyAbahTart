@@ -1,6 +1,28 @@
+<p align="center">
+  <img src="public/images/logo.jpg" alt="Tart Lejen logo" width="140">
+</p>
+
 # MYabah Tart Lejen
 
 An online shop and point-of-sale system for a tart bakery, built with Laravel 13. Customers browse the menu, order for delivery or pickup and pay online. The shop team runs orders, stock, the counter (POS), refunds and vouchers from an admin panel, and a JSON API lets an admin mobile app do the same.
+
+![Storefront home page](resources/screenshots/home.png)
+
+## Screenshots
+
+Admin screenshots use the fictional orders and customers from `php artisan db:seed`.
+
+| Menu | Admin dashboard |
+| --- | --- |
+| ![Menu page with collections and product photos](resources/screenshots/menu.png) | ![Admin dashboard with revenue, sales forecast and kitchen queue](resources/screenshots/admin-dashboard.png) |
+
+| Order board | Point of sale |
+| --- | --- |
+| ![Order board grouped by status](resources/screenshots/admin-orders.png) | ![Counter screen with product grid and current sale](resources/screenshots/admin-pos.png) |
+
+| Online vs counter sales | Works on phones |
+| --- | --- |
+| ![Sales report comparing online and counter channels](resources/screenshots/admin-sales.png) | <img src="resources/screenshots/mobile-home.png" alt="Storefront on a phone" width="48%"> <img src="resources/screenshots/mobile-admin.png" alt="Admin dashboard on a phone" width="48%"> |
 
 ## Features
 
